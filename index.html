@@ -466,7 +466,11 @@ function computePlayerStats(){
     else{map[s.jugador_id].perdidos++;}
   });
   Object.values(map).forEach(p=>{p.pts+=Math.floor(p.pj/4);});
-  mvpVotos.forEach(v=>{if(map[v.jugador_votado_id])map[v.jugador_votado_id].mvps++;});
+  // Solo contar MVPs de votaciones ya cerradas
+  mvpVotos.forEach(v=>{
+    const par=partidos.find(x=>x.id===v.partido_id);
+    if(par&&!par.mvp_abierto&&map[v.jugador_votado_id]) map[v.jugador_votado_id].mvps++;
+  });
   return Object.values(map).filter(p=>p.pj>0).sort((a,b)=>b.pts-a.pts||b.ganados-a.ganados||b.goles-a.goles);
 }
 
@@ -560,7 +564,7 @@ function renderPartidos(){
   if(!sorted.length){document.getElementById('partidos-list').innerHTML='<div class="empty">📅<br>No hay partidos finalizados</div>';return;}
   document.getElementById('partidos-list').innerHTML=sorted.map(p=>{
     const scorers=stats.filter(s=>s.partido_id===p.id&&s.goles>0);
-    const mvpW=getMvpWinner(p.id);
+    const mvpW=(!p.mvp_abierto)?getMvpWinner(p.id):null;
     return`<div class="partido">
       <div class="p-fecha">${formatFechaLarga(p.fecha)}</div>
       <div class="p-score">

@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚽ Fútbol de los Viernes</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --verde: #C8F500;
+  --verde-glow: rgba(200,245,0,0.15);
+  --negro: #080808;
+  --dark1: #101010;
+  --dark2: #181818;
+  --dark3: #222222;
+  --border: #2C2C2C;
+  --muted: #555;
+  --text: #E8E8E8;
+  --text-dim: #888;
+  --rojo: #FF4D4D;
+  --oro: #FFB800;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--negro);
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── NOISE OVERLAY ── */
+body::before {
+  content:'';
+  position:fixed; inset:0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none; z-index:1000; opacity:.4;
+}
+
+/* ── HEADER ── */
+header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 0 32px;
+  height: 64px;
+  border-bottom: 1px solid var(--border);
+  background: var(--dark1);
+  position: sticky; top:0; z-index:50;
+}
+
+.logo {
+  font-family:'Bebas Neue', sans-serif;
+  font-size: 26px;
+  letter-spacing: 3px;
+  color: var(--verde);
+  display:flex; align-items:center; gap:10px;
+}
+.logo-dot {
+  width:8px; height:8px;
+  background: var(--verde);
+  border-radius:50%;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity:1; transform:scale(1); }
+  50% { opacity:.4; transform:scale(.7); }
+}
+
+nav { display:flex; gap:2px; }
+nav button {
+  background:none; border:none;
+  color: var(--muted);
+  font-family:'Barlow Condensed', sans-serif;
+  font-size:14px; font-weight:600;
+  letter-spacing:1.5px; text-transform:uppercase;
+  padding: 8px 18px; border-radius:4px;
+  cursor:pointer; transition: all .15s;
+}
+nav button:hover { color:var(--text); background:var(--dark3); }
+nav button.active { color:var(--negro); background:var(--verde); }
+
+.season-badge {
+  font-family:'Barlow Condensed', sans-serif;
+  font-size:11px; font-weight:600; letter-spacing:2px;
+  color:var(--muted); text-transform:uppercase;
+  border:1px solid var(--border);
+  padding:5px 12px; border-radius:3px;
+}
+
+/* ── PAGES ── */
+.page { display:none; padding:36px 32px; max-width:1080px; margin:0 auto; animation: fadeIn .25s ease; }
+.page.active { display:block; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── PAGE TITLES ── */
+.page-header { margin-bottom:32px; }
+.page-title {
+  font-family:'Bebas Neue', sans-serif;
+  font-size:52px; letter-spacing:3px; line-height:1;
+  color:var(--text);
+}
+.page-title span { color:var(--verde); }
+.page-sub {
+  font-family:'Barlow Condensed', sans-serif;
+  font-size:13px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--muted); margin-top:6px;
+}
+
+/* ── TOP HERO STATS ── */
+.hero-stats {
+  display:grid; grid-template-columns: repeat(4, 1fr);
+  gap:12px; margin-bottom:32px;
+}
+.hero-stat {
+  background:var(--dark2);
+  border:1px solid var(--border);
+  border-radius:8px; padding:20px 22px;
+  position:relative; overflow:hidden;
+  transition: border-color .2s;
+}
+.hero-stat:hover { border-color: var(--verde); }
+.hero-stat::before {
+  content:''; position:absolute;
+  top:0; left:0; right:0; height:2px;
+  background: var(--verde); opacity:0;
+  transition: opacity .2s;
+}
+.hero-stat:hover::before { opacity:1; }
+.hs-label {
+  font-family:'Barlow Condensed', sans-serif;
+  font-size:11px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--muted); margin-bottom:8px;
+}
+.hs-value {
+  font-family:'Bebas Neue', sans-serif;
+  font-size:44px; letter-spacing:1px; color:var(--verde);
+  line-height:1;
+}
+.hs-detail {
+  font-size:12px; color:var(--text-dim); margin-top:4px;
+}
+
+/* ── TABLA DE POSICIONES ── */
+.tabla-wrap {
+  background:var(--dark2); border:1px solid var(--border); border-radius:10px;
+  overflow:hidden; margin-bottom:24px;
+}
+.tabla-head {
+  display:grid; grid-template-columns: 40px 1fr 50px 50px 50px 50px 50px 60px;
+  padding:12px 20px;
+  background:var(--dark3);
+  border-bottom:1px solid var(--border);
+  font-family:'Barlow Condensed', sans-serif;
+  font-size:11px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--muted);
+}
+.tabla-row {
+  display:grid; grid-template-columns: 40px 1fr 50px 50px 50px 50px 50px 60px;
+  padding:14px 20px;
+  border-bottom:1px solid var(--border);
+  align-items:center;
+  transition: background .15s;
+  cursor:pointer;
+}
+.tabla-row:last-child { border-bottom:none; }
+.tabla-row:hover { background:var(--dark3); }
+.tabla-row.top-3 .pos { color:var(--verde); font-weight:700; }
+
+.pos {
+  font-family:'Bebas Neue', sans-serif;
+  font-size:18px; color:var(--muted);
+}
+.jugador-info { display:flex; align-items:center; gap:10px; }
+.avatar {
+  width:34px; height:34px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Bebas Neue', sans-serif; font-size:14px;
+  flex-shrink:0;
+  border: 1px solid var(--border);
+}
+.jugador-nombre { font-size:15px; font-weight:600; }
+.jugador-apodo { font-size:11px; color:var(--muted); }
+
+.stat-cell {
+  text-align:center;
+  font-family:'Barlow Condensed', sans-serif;
+  font-size:16px; font-weight:600;
+}
+.stat-cell.pts {
+  color:var(--verde);
+  font-family:'Bebas Neue', sans-serif; font-size:20px;
+}
+
+/* Medals */
+.medal { font-size:14px; margin-left:4px; }
+
+/* ── DOS COLUMNAS ── */
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:24px; }
+.three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px; margin-bottom:24px; }
+
+/* ── CARD ── */
+.card {
+  background:var(--dark2); border:1px solid var(--border);
+  border-radius:10px; padding:22px;
+}
+.card-title {
+  font-family:'Barlow Condensed', sans-serif;
+  font-size:12px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--muted); margin-bottom:16px;
+  padding-bottom:12px; border-bottom:1px solid var(--border);
+}
+
+/* ── GOLEADORES CARD ── */
+.goleador-row {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 0; border-bottom:1px solid var(--border);
+}
+.goleador-row:last-child { border-bottom:none; }
+.gol-left { display:flex; align-items:center; gap:10px; }
+.gol-rank {
+  font-family:'Bebas Neue', sans-serif;
+  font-size:20px; color:var(--border); width:20px;
+}
+.gol-rank.gold { color:var(--oro); }
+.gol-rank.silver { color:#9E9E9E; }
+.gol-rank.bronze { color:#CD7F32; }
+.gol-nombre { font-size:14px; font-weight:600; }
+.gol-partidos { font-size:11px; color:var(--muted); }
+.gol-count {
+  display:flex; align-items:center; gap:5px;
+  font-family:'Bebas Neue', sans-serif; font-size:24px; color:var(--verde);
+}
+.gol-icon { font-size:14px; }
+
+/* ── PARTIDOS ── */
+.partido-card {
+  background:var(--dark2); border:1px solid var(--border);
+  border-radius:10px; padding:20px 24px;
+  margin-bottom:12px; transition: border-color .15s;
+}
+.partido-card:hover { border-color:var(--verde); }
+.partido-fecha {
+  font-family:'Barlow Condensed', sans-serif;
+  font-size:11px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--muted); margin-bottom:12px;
+}
+.partido-score {
+  display:flex; align-items:center; justify-content:center;
+  gap:20px; margin-bottom:16px;
+}
+.team-name {
+  font-family:'Bebas Neue', sans-serif;
+  font-size:22px; letter-spacing:1px; flex:1;
+}
+.team-name.right { text-align:right; }
+.score-box {
+  display:flex; align-items:center; gap:8px;
+}
+.score-num {
+  font-family:'Bebas Neue', sans-serif;
+  font-size:48px; line-height:1; color:var(--verde);
+}
+.score-sep {
+  font-family:'Bebas Neue', sans-serif;
+  font-size:32px; color:var(--muted);
+}
+.partido-details {
+  display:flex; flex-wrap:wrap; gap:8px;
+}
+.detail-chip {
+  background:var(--dark3); border:1px solid var(--border);
+  border-radius:20px; padding:4px 12px;
+  font-size:12px; color:var(--text-dim);
+}
+.detail-chip .chip-icon { margin-right:4px; }
+.mvp-chip {
+  background:rgba(255,184,0,.1);
+  border:1px solid rgba(255,184,0,.3);
+  color:var(--oro);
+}
+
+/* ── FUN STATS ── */
+.fun-stat {
+  background:var(--dark2); border:1px solid var(--border);
+  border-radius:10px; padding:20px; text-align:center;
+  transition:border-color .2s;
+}
+.fun-stat:hover { border-color:var(--verde); }
+.fun-icon { font-size:32px; margin-bottom:8px; }
+.fun-label {
+  font-family:'Barlow Condensed', sans-serif;
+  font-size:11px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--muted); margin-bottom:6px;
+}
+.fun-name { font-size:16px; font-weight:700; margin-bottom:2px; }
+.fun-detail { font-size:12px; color:var(--muted); }
+
+/* ── JUGADORES PAGE ── */
+.jugadores-grid {
+  display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr));
+  gap:14px;
+}
+.jugador-card {
+  background:var(--dark2); border:1px solid var(--border);
+  border-radius:10px; padding:22px; text-align:center;
+  cursor:pointer; transition: all .2s;
+}
+.jugador-card:hover { border-color:var(--verde); transform:translateY(-2px); }
+.jugador-card .avatar-big {
+  width:64px; height:64px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Bebas Neue', sans-serif; font-size:24px;
+  margin:0 auto 14px; border:2px solid var(--border);
+}
+.jugador-card:hover .avatar-big { border-color:var(--verde); }
+.jc-name { font-size:16px; font-weight:700; margin-bottom:8px; }
+.jc-stats { display:flex; justify-content:center; gap:16px; }
+.jc-stat { text-align:center; }
+.jc-stat-val {
+  font-family:'Bebas Neue', sans-serif;
+  font-size:22px; color:var(--verde);
+}
+.jc-stat-lbl { font-size:10px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; }
+
+/* ── MODAL ── */
+.modal-overlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,.85); z-index:200;
+  align-items:center; justify-content:center;
+}
+.modal-overlay.open { display:flex; }
+.modal {
+  background:var(--dark2); border:1px solid var(--border);
+  border-radius:12px; padding:32px; max-width:560px; width:90%;
+  max-height:85vh; overflow-y:auto;
+  animation: modalIn .2s ease;
+}
+@keyframes modalIn { from{opacity:0;transform:scale(.96)} to{opacity:1;transform:scale(1)} }
+.modal-header {
+  display:flex; align-items:flex-start; justify-content:space-between;
+  margin-bottom:24px;
+}
+.modal-close {
+  background:none; border:none; color:var(--muted);
+  font-size:24px; cursor:pointer; padding:0 4px;
+  transition:color .15s;
+}
+.modal-close:hover { color:var(--text); }
+.modal-avatar {
+  width:72px; height:72px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Bebas Neue', sans-serif; font-size:28px;
+  border:2px solid var(--verde); margin-bottom:12px;
+}
+.modal-name { font-size:22px; font-weight:700; }
+.modal-stats-grid {
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:12px; margin:20px 0;
+}
+.modal-stat {
+  background:var(--dark3); border-radius:8px;
+  padding:14px; text-align:center;
+}
+.modal-stat-val {
+  font-family:'Bebas Neue', sans-serif;
+  font-size:32px; color:var(--verde);
+}
+.modal-stat-lbl { font-size:10px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; }
+.modal-historial { margin-top:20px; }
+.historial-row {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 0; border-bottom:1px solid var(--border);
+  font-size:13px;
+}
+.historial-row:last-child { border-bottom:none; }
+.historial-fecha { color:var(--muted); font-family:'Barlow Condensed'; letter-spacing:1px; }
+
+/* ── SETUP PAGE ── */
+.setup-steps { counter-reset: step; }
+.setup-step {
+  display:flex; gap:20px;
+  padding:24px 0; border-bottom:1px solid var(--border);
+}
+.setup-step:last-child { border-bottom:none; }
+.step-num {
+  font-family:'Bebas Neue', sans-serif; font-size:32px;
+  color:var(--verde); flex-shrink:0; width:40px;
+}
+.step-content h3 {
+  font-size:17px; font-weight:700; margin-bottom:6px;
+}
+.step-content p { font-size:14px; color:var(--text-dim); line-height:1.7; }
+.step-content code {
+  background:var(--dark3); border:1px solid var(--border);
+  border-radius:4px; padding:2px 8px;
+  font-family:'Barlow Condensed', sans-serif; font-size:13px;
+  color:var(--verde);
+}
+.step-content pre {
+  background:var(--dark3); border:1px solid var(--border);
+  border-radius:6px; padding:14px; margin-top:10px;
+  font-size:12px; color:var(--text-dim);
+  overflow-x:auto; line-height:1.6;
+}
+.setup-alert {
+  background:rgba(200,245,0,.06); border:1px solid rgba(200,245,0,.2);
+  border-radius:8px; padding:16px 20px;
+  display:flex; gap:12px; align-items:flex-start;
+  margin-bottom:24px;
+}
+.setup-alert-icon { font-size:18px; flex-shrink:0; margin-top:1px; }
+.setup-alert p { font-size:13px; color:var(--text-dim); line-height:1.6; }
+.setup-alert strong { color:var(--verde); }
+
+/* ── LOADING ── */
+.loading {
+  display:flex; flex-direction:column; align-items:center;
+  justify-content:center; padding:60px;
+  color:var(--muted);
+}
+.spinner {
+  width:32px; height:32px; border:2px solid var(--border);
+  border-top-color:var(--verde); border-radius:50%;
+  animation:spin .8s linear infinite; margin-bottom:16px;
+}
+@keyframes spin { to{transform:rotate(360deg)} }
+
+/* ── SOURCE BADGE ── */
+.source-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  background:var(--dark3); border:1px solid var(--border);
+  border-radius:4px; padding:4px 10px;
+  font-family:'Barlow Condensed', sans-serif;
+  font-size:11px; letter-spacing:1.5px; text-transform:uppercase;
+  color:var(--muted); margin-bottom:24px;
+}
+.source-dot { width:6px; height:6px; border-radius:50%; background:var(--muted); }
+.source-dot.live { background:var(--verde); animation:pulse 2s infinite; }
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px) {
+  header { padding:0 16px; }
+  .page { padding:24px 16px; }
+  .hero-stats { grid-template-columns:1fr 1fr; }
+  .two-col, .three-col { grid-template-columns:1fr; }
+  .tabla-head, .tabla-row { grid-template-columns:32px 1fr 40px 40px 40px 50px; }
+  .col-ast, .col-pj-hide { display:none; }
+  nav button { padding:6px 10px; font-size:12px; }
+  .season-badge { display:none; }
+  .jugadores-grid { grid-template-columns:1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    VIERNES FC
+  </div>
+  <nav>
+    <button class="active" onclick="showPage('tabla')">Tabla</button>
+    <button onclick="showPage('partidos')">Partidos</button>
+    <button onclick="showPage('jugadores')">Jugadores</button>
+    <button onclick="showPage('setup')">⚙ Setup</button>
+  </nav>
+  <div class="season-badge">Temporada 2025</div>
+</header>
+
+<!-- ══════════════════════════════════════════
+     PÁGINA: TABLA DE POSICIONES
+══════════════════════════════════════════ -->
+<div class="page active" id="page-tabla">
+  <div class="page-header">
+    <div class="page-title">TABLA DE <span>POSICIONES</span></div>
+    <div class="page-sub">Puntos: Gol = 3pts · Asistencia = 1pt · MVP = 5pts</div>
+  </div>
+
+  <div id="source-indicator" class="source-badge">
+    <div class="source-dot" id="source-dot"></div>
+    <span id="source-text">Datos de ejemplo</span>
+  </div>
+
+  <!-- Hero Stats -->
+  <div class="hero-stats" id="hero-stats">
+    <div class="hero-stat">
+      <div class="hs-label">Partidos jugados</div>
+      <div class="hs-value" id="hs-partidos">—</div>
+      <div class="hs-detail">esta temporada</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hs-label">Goles totales</div>
+      <div class="hs-value" id="hs-goles">—</div>
+      <div class="hs-detail" id="hs-goles-avg">promedio por fecha</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hs-label">Goleador</div>
+      <div class="hs-value" id="hs-goleador" style="font-size:28px;padding-top:6px">—</div>
+      <div class="hs-detail" id="hs-goleador-goles"></div>
+    </div>
+    <div class="hero-stat">
+      <div class="hs-label">Jugadores activos</div>
+      <div class="hs-value" id="hs-jugadores">—</div>
+      <div class="hs-detail">del grupo</div>
+    </div>
+  </div>
+
+  <!-- Tabla -->
+  <div class="tabla-wrap">
+    <div class="tabla-head">
+      <div>#</div>
+      <div>Jugador</div>
+      <div style="text-align:center">PJ</div>
+      <div style="text-align:center">G</div>
+      <div style="text-align:center" class="col-ast">A</div>
+      <div style="text-align:center">MVP</div>
+      <div style="text-align:center" class="col-ast">Rat.</div>
+      <div style="text-align:center">PTS</div>
+    </div>
+    <div id="tabla-body">
+      <div class="loading"><div class="spinner"></div>Cargando...</div>
+    </div>
+  </div>
+
+  <!-- Bottom row -->
+  <div class="two-col">
+    <!-- Goleadores -->
+    <div class="card">
+      <div class="card-title">⚽ Top goleadores</div>
+      <div id="top-goleadores"></div>
+    </div>
+    <!-- Fun stats -->
+    <div class="card">
+      <div class="card-title">🎖 Reconocimientos</div>
+      <div id="reconocimientos"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PÁGINA: PARTIDOS
+══════════════════════════════════════════ -->
+<div class="page" id="page-partidos">
+  <div class="page-header">
+    <div class="page-title">HISTORIAL DE <span>PARTIDOS</span></div>
+    <div class="page-sub">Todos los viernes de la temporada</div>
+  </div>
+  <div id="partidos-list"></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PÁGINA: JUGADORES
+══════════════════════════════════════════ -->
+<div class="page" id="page-jugadores">
+  <div class="page-header">
+    <div class="page-title">PLANTEL <span>COMPLETO</span></div>
+    <div class="page-sub">Hacé click en un jugador para ver su historial</div>
+  </div>
+  <div class="jugadores-grid" id="jugadores-grid"></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PÁGINA: SETUP
+══════════════════════════════════════════ -->
+<div class="page" id="page-setup">
+  <div class="page-header">
+    <div class="page-title">SETUP Y <span>CONFIGURACIÓN</span></div>
+    <div class="page-sub">Cómo conectar Google Sheets y publicar en GitHub Pages</div>
+  </div>
+
+  <div class="setup-alert">
+    <div class="setup-alert-icon">💡</div>
+    <p>Ahora mismo la app corre con <strong>datos de ejemplo</strong>. Seguí estos pasos para conectar tu Google Sheet real y publicar la app gratis en GitHub Pages.</p>
+  </div>
+
+  <div class="card">
+    <div class="setup-steps">
+
+      <div class="setup-step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>Crear el Google Sheet</h3>
+          <p>Creá una planilla nueva en Google Sheets con <strong>3 solapas</strong> con exactamente estos nombres:</p>
+          <pre>📋 Hoja 1: "jugadores"
+   Columnas: nombre | apodo | color
+
+📋 Hoja 2: "partidos"
+   Columnas: fecha | equipo_a | equipo_b | goles_a | goles_b | mvp | notas
+
+📋 Hoja 3: "stats"
+   Columnas: fecha | jugador | goles | asistencias | equipo</pre>
+          <p style="margin-top:10px">La fila 1 de cada hoja son los <strong>encabezados</strong> (como están arriba). Los datos arrancan en la fila 2.</p>
+        </div>
+      </div>
+
+      <div class="setup-step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>Hacer la planilla pública (solo lectura)</h3>
+          <p>En Google Sheets → <strong>Compartir</strong> → "Cualquier persona con el enlace puede ver". Esto permite que la app lea los datos sin necesidad de login.</p>
+        </div>
+      </div>
+
+      <div class="setup-step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3>Obtener el ID de la planilla</h3>
+          <p>Abrí la planilla y copiá el ID de la URL:</p>
+          <pre>https://docs.google.com/spreadsheets/d/<strong>ESTE_ES_EL_ID</strong>/edit</pre>
+        </div>
+      </div>
+
+      <div class="setup-step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h3>Obtener una API Key de Google</h3>
+          <p>1. Entrá a <code>console.cloud.google.com</code><br>
+          2. Creá un proyecto nuevo (o usá uno existente)<br>
+          3. Activá la <strong>Google Sheets API</strong><br>
+          4. Credenciales → Crear credenciales → <strong>Clave de API</strong><br>
+          5. Copiá la clave generada</p>
+        </div>
+      </div>
+
+      <div class="setup-step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <h3>Configurar la app</h3>
+          <p>Abrí el archivo <code>config.js</code> y completá tus datos:</p>
+          <pre>const CONFIG = {
+  SHEET_ID: "tu_id_de_planilla_aqui",
+  API_KEY:  "tu_api_key_aqui",
+  SEASON:   "2025"
+};</pre>
+        </div>
+      </div>
+
+      <div class="setup-step">
+        <div class="step-num">6</div>
+        <div class="step-content">
+          <h3>Publicar en GitHub Pages</h3>
+          <p>1. Creá un repo en GitHub (puede ser privado)<br>
+          2. Subí los archivos <code>index.html</code> y <code>config.js</code><br>
+          3. Settings → Pages → Branch: <strong>main</strong> → Save<br>
+          4. En 1-2 minutos tu app está en: <code>tuusuario.github.io/futbol-viernes</code></p>
+        </div>
+      </div>
+
+      <div class="setup-step">
+        <div class="step-num">7</div>
+        <div class="step-content">
+          <h3>Cargar datos cada viernes</h3>
+          <p>Después de cada partido, el admin agrega una fila en la hoja <strong>stats</strong> (un jugador por fila) y actualiza la hoja <strong>partidos</strong> con el resultado. La app se actualiza automáticamente.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODAL DE JUGADOR
+══════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal-content">
+    <div class="modal-header">
+      <div>
+        <div class="modal-avatar" id="modal-avatar"></div>
+        <div class="modal-name" id="modal-name"></div>
+        <div style="font-size:13px;color:var(--muted);margin-top:2px" id="modal-apodo"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-stats-grid" id="modal-stats"></div>
+    <div class="card-title" style="margin-top:20px">Historial de partidos</div>
+    <div class="modal-historial" id="modal-historial"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     CONFIG + DATA
+══════════════════════════════════════════ -->
+<script src="config.js" onerror="console.log('config.js not found, using demo mode')"></script>
+<script>
+
+// ── CONFIG FALLBACK (si no hay config.js) ──
+if (typeof CONFIG === 'undefined') {
+  window.CONFIG = { SHEET_ID: '', API_KEY: '', SEASON: '2025' };
+}
+
+// ── DATOS DE EJEMPLO ──
+const DEMO_DATA = {
+  jugadores: [
+    { nombre: 'Martín',   apodo: 'Toto',    color: '#C8F500' },
+    { nombre: 'Lucas',    apodo: 'Luki',    color: '#00C8FF' },
+    { nombre: 'Gonzalo',  apodo: 'Gonza',   color: '#FF6B35' },
+    { nombre: 'Federico', apodo: 'Fede',    color: '#FF4D94' },
+    { nombre: 'Diego',    apodo: 'Diegote', color: '#A78BFA' },
+    { nombre: 'Nicolás',  apodo: 'Nico',    color: '#FFB800' },
+    { nombre: 'Sebastián',apodo: 'Sebas',   color: '#00FFB2' },
+    { nombre: 'Ramiro',   apodo: 'Rami',    color: '#FF4545' },
+    { nombre: 'Tomás',    apodo: 'Tomi',    color: '#C8F500' },
+    { nombre: 'Agustín',  apodo: 'Agus',    color: '#00C8FF' },
+    { nombre: 'Matías',   apodo: 'Mati',    color: '#FF6B35' },
+    { nombre: 'Pablo',    apodo: 'Pablito',  color: '#A78BFA' },
+  ],
+  partidos: [
+    { fecha:'Vie 07/03', equipo_a:'Los Pibes',  equipo_b:'Los Cracks', goles_a:5, goles_b:3, mvp:'Martín',   notas:'Primer partido de la temporada' },
+    { fecha:'Vie 14/03', equipo_a:'Equipo A',   equipo_b:'Equipo B',   goles_a:4, goles_b:4, mvp:'Lucas',    notas:'Empate épico' },
+    { fecha:'Vie 21/03', equipo_a:'Los Pibes',  equipo_b:'Los Cracks', goles_a:6, goles_b:2, mvp:'Gonzalo',  notas:'Golazo de Gonza desde mitad de cancha' },
+  ],
+  stats: [
+    { fecha:'Vie 07/03', jugador:'Martín',    goles:3, asistencias:1, equipo:'Los Pibes'  },
+    { fecha:'Vie 07/03', jugador:'Lucas',     goles:1, asistencias:2, equipo:'Los Pibes'  },
+    { fecha:'Vie 07/03', jugador:'Gonzalo',   goles:1, asistencias:0, equipo:'Los Pibes'  },
+    { fecha:'Vie 07/03', jugador:'Federico',  goles:2, asistencias:0, equipo:'Los Cracks' },
+    { fecha:'Vie 07/03', jugador:'Diego',     goles:1, asistencias:1, equipo:'Los Cracks' },
+    { fecha:'Vie 07/03', jugador:'Nicolás',   goles:0, asistencias:2, equipo:'Los Cracks' },
+    { fecha:'Vie 14/03', jugador:'Lucas',     goles:2, asistencias:1, equipo:'Equipo A'   },
+    { fecha:'Vie 14/03', jugador:'Sebastián', goles:2, asistencias:0, equipo:'Equipo A'   },
+    { fecha:'Vie 14/03', jugador:'Ramiro',    goles:0, asistencias:3, equipo:'Equipo A'   },
+    { fecha:'Vie 14/03', jugador:'Federico',  goles:2, asistencias:0, equipo:'Equipo B'   },
+    { fecha:'Vie 14/03', jugador:'Tomás',     goles:1, asistencias:1, equipo:'Equipo B'   },
+    { fecha:'Vie 14/03', jugador:'Agustín',   goles:1, asistencias:0, equipo:'Equipo B'   },
+    { fecha:'Vie 21/03', jugador:'Gonzalo',   goles:3, asistencias:1, equipo:'Los Pibes'  },
+    { fecha:'Vie 21/03', jugador:'Martín',    goles:2, asistencias:0, equipo:'Los Pibes'  },
+    { fecha:'Vie 21/03', jugador:'Matías',    goles:1, asistencias:2, equipo:'Los Pibes'  },
+    { fecha:'Vie 21/03', jugador:'Pablo',     goles:1, asistencias:0, equipo:'Los Cracks' },
+    { fecha:'Vie 21/03', jugador:'Nicolás',   goles:1, asistencias:0, equipo:'Los Cracks' },
+    { fecha:'Vie 21/03', jugador:'Diego',     goles:0, asistencias:1, equipo:'Los Cracks' },
+  ]
+};
+
+// ── STATE ──
+let DATA = null;
+let isDemo = true;
+
+// ── NAVIGATION ──
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ── AVATAR ──
+function getInitials(nombre) {
+  return nombre.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+}
+function getColor(nombre) {
+  if (!DATA) return '#C8F500';
+  const j = DATA.jugadores.find(j => j.nombre === nombre);
+  return j ? j.color : '#C8F500';
+}
+function makeAvatar(nombre, size='34px', fontSize='13px') {
+  const color = getColor(nombre);
+  const hex = color.replace('#','');
+  const r = parseInt(hex.substring(0,2),16);
+  const g = parseInt(hex.substring(2,4),16);
+  const b = parseInt(hex.substring(4,6),16);
+  const bg = `rgba(${r},${g},${b},0.15)`;
+  return `<div style="width:${size};height:${size};border-radius:50%;background:${bg};border:1.5px solid ${color};display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:${fontSize};color:${color};flex-shrink:0">${getInitials(nombre)}</div>`;
+}
+
+// ── COMPUTE STATS ──
+function computeStats() {
+  const { jugadores, partidos, stats } = DATA;
+
+  // MVPs
+  const mvpCount = {};
+  partidos.forEach(p => {
+    if (p.mvp) mvpCount[p.mvp] = (mvpCount[p.mvp] || 0) + 1;
+  });
+
+  // Per jugador
+  const playerStats = {};
+  jugadores.forEach(j => {
+    playerStats[j.nombre] = { nombre:j.nombre, pj:0, goles:0, asistencias:0, mvp: mvpCount[j.nombre]||0, fechas:[] };
+  });
+
+  // From stats sheet
+  const fechasSet = new Set();
+  stats.forEach(s => {
+    fechasSet.add(s.fecha);
+    if (!playerStats[s.jugador]) {
+      playerStats[s.jugador] = { nombre:s.jugador, pj:0, goles:0, asistencias:0, mvp: mvpCount[s.jugador]||0, fechas:[] };
+    }
+    const p = playerStats[s.jugador];
+    p.goles += parseInt(s.goles)||0;
+    p.asistencias += parseInt(s.asistencias)||0;
+    // Count unique fechas
+    if (!p.fechas.includes(s.fecha)) {
+      p.fechas.push(s.fecha);
+      p.pj++;
+    }
+    p['fecha_'+s.fecha] = { goles:parseInt(s.goles)||0, asistencias:parseInt(s.asistencias)||0, equipo:s.equipo };
+  });
+
+  // Rating = goles*3 + asistencias + mvp*5
+  // Normalizado 0-10
+  const allPts = Object.values(playerStats).map(p => p.goles*3 + p.asistencias + p.mvp*5);
+  const maxPts = Math.max(...allPts, 1);
+
+  Object.values(playerStats).forEach(p => {
+    p.pts = p.goles*3 + p.asistencias*1 + p.mvp*5;
+    p.rating = Math.round((p.pts / maxPts) * 10 * 10) / 10;
+  });
+
+  const sorted = Object.values(playerStats)
+    .filter(p => p.pj > 0)
+    .sort((a,b) => b.pts - a.pts || b.goles - a.goles);
+
+  return { sorted, fechas: [...fechasSet], partidos: partidos.length, totalGoles: stats.reduce((s,r)=>s+(parseInt(r.goles)||0),0) };
+}
+
+// ── RENDER TABLA ──
+function renderTabla() {
+  const { sorted, fechas, partidos: nPartidos, totalGoles } = computeStats();
+  const medals = ['🥇','🥈','🥉'];
+
+  // Hero
+  document.getElementById('hs-partidos').textContent = nPartidos;
+  document.getElementById('hs-goles').textContent = totalGoles;
+  document.getElementById('hs-goles-avg').textContent = nPartidos ? (totalGoles/nPartidos).toFixed(1)+' promedio por fecha' : '';
+  document.getElementById('hs-jugadores').textContent = sorted.length;
+  if (sorted.length) {
+    document.getElementById('hs-goleador').textContent = sorted[0].nombre.split(' ')[0];
+    document.getElementById('hs-goleador-goles').textContent = sorted[0].goles + ' goles · ' + sorted[0].pts + ' pts';
+  }
+
+  // Tabla
+  const tbody = document.getElementById('tabla-body');
+  if (!sorted.length) { tbody.innerHTML = '<div style="padding:24px;text-align:center;color:var(--muted)">No hay datos aún</div>'; return; }
+
+  tbody.innerHTML = sorted.map((p, i) => `
+    <div class="tabla-row ${i<3?'top-3':''}" onclick="openModal('${p.nombre}')">
+      <div class="pos">${i<3 ? medals[i] : i+1}</div>
+      <div class="jugador-info">
+        ${makeAvatar(p.nombre)}
+        <div>
+          <div class="jugador-nombre">${p.nombre}</div>
+        </div>
+      </div>
+      <div class="stat-cell">${p.pj}</div>
+      <div class="stat-cell">${p.goles}</div>
+      <div class="stat-cell col-ast">${p.asistencias}</div>
+      <div class="stat-cell">${p.mvp > 0 ? '⭐'.repeat(Math.min(p.mvp,3)) : '—'}</div>
+      <div class="stat-cell col-ast" style="color:var(--text-dim)">${p.rating}</div>
+      <div class="stat-cell pts">${p.pts}</div>
+    </div>
+  `).join('');
+
+  // Top goleadores
+  const topG = [...sorted].sort((a,b) => b.goles-a.goles).slice(0,5);
+  const rankClass = ['gold','silver','bronze'];
+  document.getElementById('top-goleadores').innerHTML = topG.map((p,i) => `
+    <div class="goleador-row">
+      <div class="gol-left">
+        <div class="gol-rank ${rankClass[i]||''}">${i+1}</div>
+        ${makeAvatar(p.nombre)}
+        <div>
+          <div class="gol-nombre">${p.nombre}</div>
+          <div class="gol-partidos">${p.pj} partido${p.pj!==1?'s':''}</div>
+        </div>
+      </div>
+      <div class="gol-count"><span class="gol-icon">⚽</span>${p.goles}</div>
+    </div>
+  `).join('');
+
+  // Reconocimientos
+  const maxAsist = [...sorted].sort((a,b) => b.asistencias-a.asistencias)[0];
+  const maxMvp   = [...sorted].sort((a,b) => b.mvp-a.mvp)[0];
+  const maxPJ    = [...sorted].sort((a,b) => b.pj-a.pj)[0];
+  const recs = [
+    { icon:'🎯', label:'Asistidor', nombre:maxAsist?.nombre, detail: maxAsist?.asistencias+' asistencias' },
+    { icon:'⭐', label:'MVP', nombre:maxMvp?.nombre, detail: maxMvp?.mvp+' premios MVP' },
+    { icon:'📅', label:'El Fijo', nombre:maxPJ?.nombre, detail: maxPJ?.pj+' partidos jugados' },
+  ];
+  document.getElementById('reconocimientos').innerHTML = recs.map(r => `
+    <div class="goleador-row">
+      <div class="gol-left">
+        <div style="font-size:22px;width:28px">${r.icon}</div>
+        ${r.nombre ? makeAvatar(r.nombre) : ''}
+        <div>
+          <div class="gol-nombre">${r.nombre || '—'}</div>
+          <div class="gol-partidos">${r.label} · ${r.detail}</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── RENDER PARTIDOS ──
+function renderPartidos() {
+  const el = document.getElementById('partidos-list');
+  if (!DATA.partidos.length) { el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:40px">No hay partidos registrados</div>'; return; }
+  el.innerHTML = [...DATA.partidos].reverse().map(p => {
+    const gA = parseInt(p.goles_a)||0, gB = parseInt(p.goles_b)||0;
+    const fecha = p.fecha;
+    // Scorers for this match
+    const scorers = DATA.stats.filter(s => s.fecha === fecha && (parseInt(s.goles)||0) > 0);
+    const chips = scorers.map(s =>
+      `<span class="detail-chip"><span class="chip-icon">⚽</span>${s.jugador} (${s.goles})</span>`
+    ).join('');
+    const mvpChip = p.mvp ? `<span class="detail-chip mvp-chip">⭐ MVP: ${p.mvp}</span>` : '';
+    const noteChip = p.notas ? `<span class="detail-chip">${p.notas}</span>` : '';
+    return `
+      <div class="partido-card">
+        <div class="partido-fecha">${p.fecha}</div>
+        <div class="partido-score">
+          <div class="team-name">${p.equipo_a || 'Equipo A'}</div>
+          <div class="score-box">
+            <div class="score-num">${gA}</div>
+            <div class="score-sep">—</div>
+            <div class="score-num">${gB}</div>
+          </div>
+          <div class="team-name right">${p.equipo_b || 'Equipo B'}</div>
+        </div>
+        <div class="partido-details">${mvpChip}${chips}${noteChip}</div>
+      </div>`;
+  }).join('');
+}
+
+// ── RENDER JUGADORES ──
+function renderJugadores() {
+  const { sorted } = computeStats();
+  const grid = document.getElementById('jugadores-grid');
+  // Include jugadores with 0 games
+  const allNames = DATA.jugadores.map(j=>j.nombre);
+  const statsMap = {};
+  sorted.forEach(p => statsMap[p.nombre]=p);
+  const all = allNames.map(n => statsMap[n] || { nombre:n, pj:0, goles:0, asistencias:0, mvp:0, pts:0 });
+
+  grid.innerHTML = all.map(p => `
+    <div class="jugador-card" onclick="openModal('${p.nombre}')">
+      <div class="avatar-big" style="background:rgba(${hexToRgb(getColor(p.nombre))},0.12);border-color:${p.pj>0?getColor(p.nombre):'var(--border)'};color:${getColor(p.nombre)}">
+        ${getInitials(p.nombre)}
+      </div>
+      <div class="jc-name">${p.nombre}</div>
+      <div class="jc-stats">
+        <div class="jc-stat"><div class="jc-stat-val">${p.pj}</div><div class="jc-stat-lbl">PJ</div></div>
+        <div class="jc-stat"><div class="jc-stat-val">${p.goles}</div><div class="jc-stat-lbl">Goles</div></div>
+        <div class="jc-stat"><div class="jc-stat-val">${p.pts}</div><div class="jc-stat-lbl">Pts</div></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function hexToRgb(hex) {
+  const h = hex.replace('#','');
+  return `${parseInt(h.substring(0,2),16)},${parseInt(h.substring(2,4),16)},${parseInt(h.substring(4,6),16)}`;
+}
+
+// ── MODAL ──
+function openModal(nombre) {
+  const { sorted } = computeStats();
+  const p = sorted.find(x=>x.nombre===nombre) || { nombre, pj:0, goles:0, asistencias:0, mvp:0, pts:0, rating:0, fechas:[] };
+  const color = getColor(nombre);
+  const j = DATA.jugadores.find(j=>j.nombre===nombre);
+
+  document.getElementById('modal-avatar').style.cssText = `background:rgba(${hexToRgb(color)},0.15);border-color:${color};color:${color}`;
+  document.getElementById('modal-avatar').textContent = getInitials(nombre);
+  document.getElementById('modal-name').textContent = nombre;
+  document.getElementById('modal-apodo').textContent = j?.apodo ? '"'+j.apodo+'"' : '';
+
+  document.getElementById('modal-stats').innerHTML = [
+    { val:p.pj, lbl:'Partidos' },
+    { val:p.goles, lbl:'Goles' },
+    { val:p.asistencias, lbl:'Asistencias' },
+    { val:p.mvp, lbl:'MVPs' },
+    { val:p.rating, lbl:'Rating' },
+    { val:p.pts, lbl:'Puntos totales' },
+  ].map(s=>`<div class="modal-stat"><div class="modal-stat-val" style="color:${color}">${s.val}</div><div class="modal-stat-lbl">${s.lbl}</div></div>`).join('');
+
+  // Historial
+  const historial = DATA.stats.filter(s=>s.jugador===nombre);
+  document.getElementById('modal-historial').innerHTML = historial.length
+    ? historial.map(s=>`
+        <div class="historial-row">
+          <div class="historial-fecha">${s.fecha}</div>
+          <div style="font-size:12px;color:var(--muted)">${s.equipo}</div>
+          <div style="font-size:13px">⚽ ${s.goles} · 🎯 ${s.asistencias}</div>
+        </div>`).join('')
+    : '<div style="color:var(--muted);font-size:13px;padding:12px 0">Sin partidos registrados</div>';
+
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modal-overlay')) {
+    document.getElementById('modal-overlay').classList.remove('open');
+  }
+}
+
+// ── GOOGLE SHEETS LOADER ──
+async function loadFromSheets() {
+  const { SHEET_ID, API_KEY } = CONFIG;
+  if (!SHEET_ID || !API_KEY) return false;
+
+  const base = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values`;
+  try {
+    const [jugRes, parRes, stRes] = await Promise.all([
+      fetch(`${base}/jugadores?key=${API_KEY}`).then(r=>r.json()),
+      fetch(`${base}/partidos?key=${API_KEY}`).then(r=>r.json()),
+      fetch(`${base}/stats?key=${API_KEY}`).then(r=>r.json()),
+    ]);
+
+    function parseSheet(res) {
+      const rows = res.values || [];
+      if (rows.length < 2) return [];
+      const headers = rows[0].map(h => h.toLowerCase().trim());
+      return rows.slice(1).map(row => {
+        const obj = {};
+        headers.forEach((h,i) => obj[h] = row[i] || '');
+        return obj;
+      });
+    }
+
+    DATA = {
+      jugadores: parseSheet(jugRes),
+      partidos:  parseSheet(parRes),
+      stats:     parseSheet(stRes),
+    };
+    return true;
+  } catch(e) {
+    console.error('Error loading from Sheets:', e);
+    return false;
+  }
+}
+
+// ── INIT ──
+async function init() {
+  const loaded = await loadFromSheets();
+  if (loaded) {
+    isDemo = false;
+    document.getElementById('source-dot').classList.add('live');
+    document.getElementById('source-text').textContent = 'Google Sheets · en vivo';
+  } else {
+    DATA = DEMO_DATA;
+    document.getElementById('source-text').textContent = 'Datos de ejemplo · configurá tu Sheet';
+  }
+  renderTabla();
+  renderPartidos();
+  renderJugadores();
+}
+
+init();
+</script>
+</body>
+</html>

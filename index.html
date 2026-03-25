@@ -779,10 +779,13 @@ function openSwap(jidSale,equipo){
 async function doSwap(jidEntra){
   const pp=partidos.find(p=>p.estado==='pendiente');if(!pp)return;
   if(sb){
-    const{data:rowData}=await sb.from('partido_jugadores').select('equipo').eq('partido_id',pp.id).eq('jugador_id',swapSaleId).single();
-    const equipoSwap=rowData?.equipo||swapEquipo;
-    await sb.from('partido_jugadores').delete().eq('partido_id',pp.id).eq('jugador_id',swapSaleId);
-    await sb.from('partido_jugadores').insert({partido_id:pp.id,jugador_id:jidEntra,equipo:equipoSwap,goles:0});
+    const{data:rowData,error:rowErr}=await sb.from('partido_jugadores').select('equipo').eq('partido_id',pp.id).eq('jugador_id',swapSaleId).single();
+    if(rowErr){console.error('Error buscando jugador:',rowErr);alert('Error al buscar jugador: '+rowErr.message);return;}
+    const equipoSwap=rowData.equipo;
+    const{error:delErr}=await sb.from('partido_jugadores').delete().eq('partido_id',pp.id).eq('jugador_id',swapSaleId);
+    if(delErr){console.error('Error borrando:',delErr);alert('Error al quitar jugador: '+delErr.message);return;}
+    const{error:insErr}=await sb.from('partido_jugadores').insert({partido_id:pp.id,jugador_id:jidEntra,equipo:equipoSwap,goles:0});
+    if(insErr){console.error('Error insertando:',insErr);alert('Error al agregar jugador: '+insErr.message);return;}
     await loadData();
   }else{
     const row=stats.find(s=>s.partido_id===pp.id&&s.jugador_id===swapSaleId);

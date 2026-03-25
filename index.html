@@ -779,7 +779,10 @@ function openSwap(jidSale,equipo){
 async function doSwap(jidEntra){
   const pp=partidos.find(p=>p.estado==='pendiente');if(!pp)return;
   if(sb){
-    await sb.from('partido_jugadores').update({jugador_id:jidEntra}).eq('partido_id',pp.id).eq('jugador_id',swapSaleId);
+    const{data:rowData}=await sb.from('partido_jugadores').select('equipo').eq('partido_id',pp.id).eq('jugador_id',swapSaleId).single();
+    const equipoSwap=rowData?.equipo||swapEquipo;
+    await sb.from('partido_jugadores').delete().eq('partido_id',pp.id).eq('jugador_id',swapSaleId);
+    await sb.from('partido_jugadores').insert({partido_id:pp.id,jugador_id:jidEntra,equipo:equipoSwap,goles:0});
     await loadData();
   }else{
     const row=stats.find(s=>s.partido_id===pp.id&&s.jugador_id===swapSaleId);
@@ -812,7 +815,7 @@ async function guardarResultado(){
   const golesA=jugA.reduce((s,x)=>s+(parseInt(document.getElementById('goles-'+x.jugador_id)?.value)||0),0);
   const golesB=jugB.reduce((s,x)=>s+(parseInt(document.getElementById('goles-'+x.jugador_id)?.value)||0),0);
   // Validación
-  const incons=(selectedResult==='a'&&golesB>golesA)||(selectedResult==='b'&&golesA>golesB)||(selectedResult==='draw'&&golesA!==golesB);
+  const incons=(selectedResult==='a'&&golesA<=golesB)||(selectedResult==='b'&&golesB<=golesA)||(selectedResult==='draw'&&golesA!==golesB);
   if(incons){
     const ganNombre=selectedResult==='a'?'Equipo A':selectedResult==='b'?'Equipo B':'empate';
     showConfirm('Los goles no coinciden con el resultado',`Marcaste que ganó ${ganNombre} pero los goles muestran ${golesA}-${golesB}. ¿Puede que falten goles por cargar?`,()=>_doGuardar(pp,jugA,jugB,golesA,golesB));
@@ -833,11 +836,12 @@ async function _doGuardar(pp,jugA,jugB,golesA,golesB){
       await sb.from('partido_jugadores').update({goles:g}).eq('partido_id',pp.id).eq('jugador_id',s.jugador_id);
     }
     await loadData();
+    partidoAbierto=partidos.find(p=>p.mvp_abierto)||null;
   }else{
     const p=partidos.find(x=>x.id===pp.id);
     if(p){p.goles_a=golesA;p.goles_b=golesB;p.resultado=selectedResult;p.estado='finalizado';p.mvp_abierto=true;p.mvp_cierre=cierre.toISOString();}
     [...jugA,...jugB].forEach(s=>{const row=stats.find(x=>x.partido_id===pp.id&&x.jugador_id===s.jugador_id);if(row)row.goles=parseInt(document.getElementById('goles-'+s.jugador_id)?.value)||0;});
-    partidoAbierto=partidos.find(x=>x.id===pp.id)||null;
+    partidoAbierto=partidos.find(x=>x.id===pp.id&&x.mvp_abierto)||null;
   }
   document.getElementById('save-alert').innerHTML='<div class="alert alert-success">¡Partido guardado! Votación MVP abierta por 24hs ✅</div>';
   renderTabla();renderPartidos();renderJugadores();

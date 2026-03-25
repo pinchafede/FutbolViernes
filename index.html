@@ -54,7 +54,7 @@ nav button.active{color:var(--negro);background:var(--verde);}
 .pb-teams{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:start;}
 .pb-team-title{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;margin-bottom:8px;}
 .pb-team-title.a{color:var(--azul);}
-.pb-team-title.b{color:var(--naranja);}
+.pb-team-title.b{color:var(--rojo);}
 .pb-player{display:flex;align-items:center;gap:6px;font-size:13px;margin-bottom:4px;}
 .pb-vs{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--border);padding-top:22px;text-align:center;}
 /* MVP BANNER */
@@ -65,10 +65,10 @@ nav button.active{color:var(--negro);background:var(--verde);}
 .btn-vote:hover{opacity:.85;}
 /* TABLA */
 .tabla-wrap{background:var(--dark2);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:20px;}
-.tabla-head{display:grid;grid-template-columns:44px 1fr 52px 52px 52px 64px;padding:10px 18px;background:var(--dark3);border-bottom:1px solid var(--border);}
+.tabla-head{display:grid;grid-template-columns:44px 1fr 44px 44px 44px 44px 52px 64px;padding:10px 18px;background:var(--dark3);border-bottom:1px solid var(--border);}
 .tabla-head span{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-align:center;}
 .tabla-head span:nth-child(2){text-align:left;}
-.tabla-row{display:grid;grid-template-columns:44px 1fr 52px 52px 52px 64px;padding:12px 18px;border-bottom:1px solid var(--border);align-items:center;cursor:pointer;transition:background .12s;}
+.tabla-row{display:grid;grid-template-columns:44px 1fr 44px 44px 44px 44px 52px 64px;padding:12px 18px;border-bottom:1px solid var(--border);align-items:center;cursor:pointer;transition:background .12s;}
 .tabla-row:last-child{border-bottom:none;}
 .tabla-row:hover{background:var(--dark3);}
 .t-pos{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--muted);}
@@ -117,13 +117,13 @@ nav button.active{color:var(--negro);background:var(--verde);}
 .ps-card{background:var(--dark3);border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .15s;}
 .ps-card:hover{border-color:var(--text-dim);}
 .ps-card.sel-a{border-color:var(--azul);background:rgba(77,159,255,.08);}
-.ps-card.sel-b{border-color:var(--naranja);background:rgba(255,107,53,.08);}
+.ps-card.sel-b{border-color:var(--rojo);background:rgba(255,77,77,.08);}
 .ps-card-name{font-size:13px;font-weight:600;}
 .ps-card-team{font-size:10px;color:var(--muted);margin-top:1px;}
 .team-builder{display:grid;grid-template-columns:1fr 40px 1fr;gap:12px;align-items:start;}
 .team-col{background:var(--dark3);border:1px solid var(--border);border-radius:8px;padding:14px;}
 .team-col-title{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);}
-.team-col-title.a{color:var(--azul);}.team-col-title.b{color:var(--naranja);}
+.team-col-title.a{color:var(--azul);}.team-col-title.b{color:var(--rojo);}
 .team-player-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);}
 .team-player-row:last-child{border-bottom:none;}
 .team-player-left{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;}
@@ -135,7 +135,7 @@ nav button.active{color:var(--negro);background:var(--verde);}
 .res-btn:hover{border-color:var(--text-dim);color:var(--text);}
 .res-btn.sel-a{border-color:var(--azul);background:rgba(77,159,255,.1);color:var(--azul);}
 .res-btn.sel-draw{border-color:var(--oro);background:rgba(255,184,0,.08);color:var(--oro);}
-.res-btn.sel-b{border-color:var(--naranja);background:rgba(255,107,53,.1);color:var(--naranja);}
+.res-btn.sel-b{border-color:var(--rojo);background:rgba(255,77,77,.1);color:var(--rojo);}
 .swap-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);}
 .swap-row:last-child{border-bottom:none;}
 .swap-btn{background:none;border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:11px;padding:4px 10px;cursor:pointer;font-family:'Barlow Condensed';letter-spacing:1px;transition:all .15s;}
@@ -178,7 +178,7 @@ nav button.active{color:var(--negro);background:var(--verde);}
 @media(max-width:768px){
   header{padding:0 14px;}nav button{padding:6px 8px;font-size:11px;}
   .page{padding:20px 14px;}.g2,.g4{grid-template-columns:1fr 1fr;}
-  .tabla-head,.tabla-row{grid-template-columns:36px 1fr 44px 44px 54px;}.col-pj{display:none;}
+  .tabla-head,.tabla-row{grid-template-columns:36px 1fr 40px 40px 50px;}.col-pj{display:none;}.col-gest{display:none;}.col-bonus{display:none;}
   .team-builder{grid-template-columns:1fr;}.vs-badge{display:none;}
   .jgrid{grid-template-columns:1fr 1fr;}.pb-teams{grid-template-columns:1fr;}.pb-vs{display:none;}
 }
@@ -212,7 +212,7 @@ nav button.active{color:var(--negro);background:var(--verde);}
   <div class="g4" style="margin-bottom:20px" id="hero-stats"><div class="loading"><div class="spinner"></div></div></div>
   <div class="tabla-wrap">
     <div class="tabla-head">
-      <span>#</span><span>Jugador</span><span class="col-pj">PJ</span><span>G</span><span>⭐</span><span>PTS</span>
+      <span>#</span><span>Jugador</span><span class="col-pj">PJ</span><span class="col-gest">G</span><span class="col-gest">E</span><span class="col-gest">P</span><span class="col-bonus">+B</span><span>PTS</span>
     </div>
     <div id="tabla-body"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
   </div>
@@ -252,6 +252,7 @@ nav button.active{color:var(--negro);background:var(--verde);}
     <div class="tabs">
       <button class="tab active" onclick="showAdminTab('partido',this)">Partido</button>
       <button class="tab" onclick="showAdminTab('jugadores-mgmt',this)">Jugadores</button>
+      <button class="tab" onclick="showAdminTab('historial-admin',this)">Historial</button>
       <button class="tab" onclick="showAdminTab('mvp-admin',this)">MVP</button>
     </div>
 
@@ -269,15 +270,28 @@ nav button.active{color:var(--negro);background:var(--verde);}
           </div>
         </div>
         <div class="admin-section">
+          <div class="admin-section-title">Nombres de los equipos</div>
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label" style="color:var(--azul)">Equipo A</label>
+              <input type="text" class="input" id="nombre-equipo-a" placeholder="Ej: Los Pibes" maxlength="20">
+            </div>
+            <div class="input-group">
+              <label class="input-label" style="color:var(--rojo)">Equipo B</label>
+              <input type="text" class="input" id="nombre-equipo-b" placeholder="Ej: Los Cracks" maxlength="20">
+            </div>
+          </div>
+        </div>
+        <div class="admin-section">
           <div class="admin-section-title">Seleccioná los 14 jugadores</div>
           <div style="font-size:13px;color:var(--text-dim);margin-bottom:10px">
             1er click → <span style="color:var(--azul);font-weight:700">Equipo A</span> &nbsp;·&nbsp;
-            2do click → <span style="color:var(--naranja);font-weight:700">Equipo B</span> &nbsp;·&nbsp;
+            2do click → <span style="color:var(--rojo);font-weight:700">Equipo B</span> &nbsp;·&nbsp;
             3er click → quita del partido
           </div>
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
             <span id="sel-count-a" style="color:var(--azul);font-family:'Barlow Condensed';font-weight:700;font-size:14px">A: 0/7</span>
-            <span id="sel-count-b" style="color:var(--naranja);font-family:'Barlow Condensed';font-weight:700;font-size:14px">B: 0/7</span>
+            <span id="sel-count-b" style="color:var(--rojo);font-family:'Barlow Condensed';font-weight:700;font-size:14px">B: 0/7</span>
             <button class="btn btn-secondary" style="margin-left:auto;padding:5px 12px;font-size:11px" onclick="clearSelection()">Limpiar</button>
           </div>
           <div class="player-select-grid" id="player-select-grid"></div>
@@ -329,6 +343,11 @@ nav button.active{color:var(--negro);background:var(--verde);}
       </div>
     </div>
 
+    <!-- TAB HISTORIAL ADMIN -->
+    <div id="tab-historial-admin" style="display:none">
+      <div id="historial-admin-list"></div>
+    </div>
+
     <!-- TAB MVP -->
     <div id="tab-mvp-admin" style="display:none">
       <div id="mvp-admin-status"></div>
@@ -347,6 +366,7 @@ nav button.active{color:var(--negro);background:var(--verde);}
       <button class="modal-close" onclick="closeModalById('modal-jugador')">✕</button>
     </div>
     <div class="mstat-grid" id="mj-stats"></div>
+    <div id="mj-rachas"></div>
     <div class="card-title" style="margin-top:4px">Historial</div>
     <div id="mj-historial"></div>
   </div>
@@ -375,6 +395,27 @@ nav button.active{color:var(--negro);background:var(--verde);}
     </div>
     <p style="font-size:13px;color:var(--text-dim);margin-bottom:14px">Reemplazar a <strong id="swap-sale-nombre"></strong> por:</p>
     <div id="swap-candidates"></div>
+  </div>
+</div>
+
+<!-- MODAL EDITAR PARTIDO -->
+<div class="overlay" id="modal-editar" onclick="closeModal('modal-editar',event)">
+  <div class="modal" style="max-width:620px">
+    <div class="modal-top">
+      <div>
+        <div style="font-size:18px;font-weight:700">✏️ Editar partido</div>
+        <div style="font-size:12px;color:var(--muted)" id="edit-partido-title"></div>
+      </div>
+      <button class="modal-close" onclick="closeModalById('modal-editar')">✕</button>
+    </div>
+    <div class="team-builder" id="edit-team-builder" style="margin-bottom:18px"></div>
+    <div class="admin-section-title">Resultado</div>
+    <div style="display:flex;gap:10px;margin-bottom:16px">
+      <button class="res-btn edit-res-btn" data-res="a" onclick="selectEditResult('a',this)" id="edit-btn-a">Ganó Equipo A</button>
+      <button class="res-btn edit-res-btn" data-res="draw" onclick="selectEditResult('draw',this)">Empate</button>
+      <button class="res-btn edit-res-btn" data-res="b" onclick="selectEditResult('b',this)">Ganó Equipo B</button>
+    </div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="guardarEdicion()" id="btn-guardar-edicion">Guardar cambios</button>
   </div>
 </div>
 
@@ -454,7 +495,11 @@ async function loadData(){
 
 function computePlayerStats(){
   const map={};
-  jugadores.forEach(j=>{map[j.id]={...j,pj:0,goles:0,ganados:0,empatados:0,perdidos:0,pts:0,mvps:0};});
+  jugadores.forEach(j=>{map[j.id]={...j,pj:0,goles:0,ganados:0,empatados:0,perdidos:0,pts:0,bonus:0,mvps:0,rachaActiva:0,rachaVictorias:0};});
+
+  // Build sorted finished partidos for streak calc
+  const finSorted=[...partidos].filter(p=>p.estado==='finalizado').sort((a,b)=>new Date(a.fecha)-new Date(b.fecha));
+
   stats.forEach(s=>{
     if(!map[s.jugador_id])return;
     const p=partidos.find(x=>x.id===s.partido_id);
@@ -465,7 +510,35 @@ function computePlayerStats(){
     else if(p.resultado===s.equipo){map[s.jugador_id].ganados++;map[s.jugador_id].pts+=3;}
     else{map[s.jugador_id].perdidos++;}
   });
-  Object.values(map).forEach(p=>{p.pts+=Math.floor(p.pj/4);});
+
+  Object.values(map).forEach(p=>{
+    p.bonus=Math.floor(p.pj/4);
+    p.pts+=p.bonus;
+  });
+
+  // Rachas activas — recorrer partidos de más reciente a más viejo
+  const finDesc=[...finSorted].reverse();
+  Object.values(map).forEach(player=>{
+    let rachaJugados=0, rachaVict=0;
+    let streakJugadosRota=false, streakVictRota=false;
+    for(const par of finDesc){
+      const s=stats.find(x=>x.partido_id===par.id&&x.jugador_id===player.id);
+      if(!s){
+        streakJugadosRota=true;
+        streakVictRota=true;
+      } else {
+        if(!streakJugadosRota) rachaJugados++;
+        else streakJugadosRota=true;
+        const gano=par.resultado===s.equipo;
+        if(!streakVictRota&&gano) rachaVict++;
+        else streakVictRota=true;
+      }
+      if(streakJugadosRota&&streakVictRota) break;
+    }
+    player.rachaActiva=rachaJugados;
+    player.rachaVictorias=rachaVict;
+  });
+
   // Solo contar MVPs de votaciones ya cerradas
   mvpVotos.forEach(v=>{
     const par=partidos.find(x=>x.id===v.partido_id);
@@ -525,9 +598,15 @@ function renderTabla(){
         <div class="pb-fecha">${fechaStr}</div>
       </div>
       <div class="pb-teams">
-        <div><div class="pb-team-title a">Equipo A</div>${jugA.map(s=>{const j=getJ(s.jugador_id);return`<div class="pb-player">${avHtml(j.nombre,j.color,'22px','8px')}<span>${j.nombre}</span></div>`;}).join('')}</div>
-        <div class="pb-vs">VS</div>
-        <div><div class="pb-team-title b">Equipo B</div>${jugB.map(s=>{const j=getJ(s.jugador_id);return`<div class="pb-player">${avHtml(j.nombre,j.color,'22px','8px')}<span>${j.nombre}</span></div>`;}).join('')}</div>
+        <div style="background:rgba(77,159,255,0.06);border:1px solid rgba(77,159,255,0.2);border-radius:8px;padding:12px">
+            <div class="pb-team-title a" style="margin-bottom:8px">${pp.equipo_a||'Equipo A'}</div>
+            ${jugA.map(s=>{const j=getJ(s.jugador_id);return`<div class="pb-player">${avHtml(j.nombre,j.color,'22px','8px')}<span>${j.nombre}</span></div>`;}).join('')}
+          </div>
+          <div class="pb-vs">VS</div>
+          <div style="background:rgba(255,77,77,0.06);border:1px solid rgba(255,77,77,0.2);border-radius:8px;padding:12px">
+            <div class="pb-team-title b" style="color:var(--rojo);margin-bottom:8px">${pp.equipo_b||'Equipo B'}</div>
+            ${jugB.map(s=>{const j=getJ(s.jugador_id);return`<div class="pb-player">${avHtml(j.nombre,j.color,'22px','8px')}<span>${j.nombre}</span></div>`;}).join('')}
+          </div>
       </div>
     </div>`;
   } else { pbEl.style.display='none'; }
@@ -604,11 +683,30 @@ function openJugadorModal(jid){
   document.getElementById('mj-avatar').textContent=initials(p.nombre);
   document.getElementById('mj-nombre').textContent=p.nombre;
   document.getElementById('mj-apodo').textContent=p.apodo?`"${p.apodo}"`:'';
+  const rachaJStr=p.rachaActiva>0?`🔥 ${p.rachaActiva}`:'—';
+  const rachaVStr=p.rachaVictorias>0?`🏆 ${p.rachaVictorias}`:'—';
   document.getElementById('mj-stats').innerHTML=[
-    {val:p.pj||0,lbl:'Partidos'},{val:p.goles||0,lbl:'Goles'},
-    {val:p.ganados||0,lbl:'Ganados'},{val:p.empatados||0,lbl:'Empates'},
-    {val:p.perdidos||0,lbl:'Perdidos'},{val:p.mvps||0,lbl:'MVPs'},
-  ].map(s=>`<div class="mstat"><div class="mstat-val" style="color:${color}">${s.val}</div><div class="mstat-lbl">${s.lbl}</div></div>`).join('');
+    {val:p.pj||0,     lbl:'Partidos',  color},
+    {val:p.goles||0,  lbl:'Goles',     color},
+    {val:p.ganados||0,lbl:'Ganados',   color:'var(--verde)'},
+    {val:p.empatados||0,lbl:'Empates', color:'var(--oro)'},
+    {val:p.perdidos||0,lbl:'Perdidos', color:'var(--rojo)'},
+    {val:p.mvps||0,   lbl:'MVPs',      color:'var(--oro)'},
+    {val:'+'+( p.bonus||0), lbl:'Bonus presentismo', color:'var(--azul)'},
+    {val:p.pts||0,    lbl:'Puntos totales', color},
+  ].map(s=>`<div class="mstat"><div class="mstat-val" style="color:${s.color||color}">${s.val}</div><div class="mstat-lbl">${s.lbl}</div></div>`).join('');
+  // Rachas
+  document.getElementById('mj-rachas').innerHTML=`
+    <div style="display:flex;gap:12px;margin-top:14px;margin-bottom:4px">
+      <div style="flex:1;background:var(--dark3);border-radius:8px;padding:12px;text-align:center">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--verde)">${rachaJStr}</div>
+        <div style="font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Racha activa PJ</div>
+      </div>
+      <div style="flex:1;background:var(--dark3);border-radius:8px;padding:12px;text-align:center">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--oro)">${rachaVStr}</div>
+        <div style="font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Racha victorias</div>
+      </div>
+    </div>`;
   const hist=stats.filter(s=>s.jugador_id===jid&&partidos.find(x=>x.id===s.partido_id&&x.estado==='finalizado'));
   document.getElementById('mj-historial').innerHTML=hist.length
     ?hist.map(s=>{const par=partidos.find(x=>x.id===s.partido_id);if(!par)return'';const res=par.resultado==='draw'?'🟡 Empate':par.resultado===s.equipo?'🟢 Victoria':'🔴 Derrota';return`<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px"><div style="color:var(--muted);font-family:'Barlow Condensed';letter-spacing:1px">${formatFecha(par.fecha)}</div><div>${res}</div><div>⚽ ${s.goles}</div></div>`;}).join('')
@@ -662,9 +760,10 @@ function adminLogin(){
   }else{document.getElementById('login-error').innerHTML='<div class="alert alert-error">Contraseña incorrecta</div>';}
 }
 function showAdminTab(tab,btn){
-  ['partido','jugadores-mgmt','mvp-admin'].forEach(t=>{document.getElementById('tab-'+t).style.display=t===tab?'block':'none';});
+  ['partido','jugadores-mgmt','historial-admin','mvp-admin'].forEach(t=>{document.getElementById('tab-'+t).style.display=t===tab?'block':'none';});
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
   if(tab==='jugadores-mgmt')renderAdminJugadores();
+  if(tab==='historial-admin')renderHistorialAdmin();
   if(tab==='mvp-admin')renderMvpAdminStatus();
 }
 
@@ -707,7 +806,7 @@ function updateSelectionUI(){
     const card=document.getElementById('ps-'+j.id);const tEl=document.getElementById('ps-team-'+j.id);if(!card)return;
     card.classList.remove('sel-a','sel-b');
     if(playerSelection[j.id]==='a'){card.classList.add('sel-a');tEl.textContent='Equipo A';tEl.style.color='var(--azul)';}
-    else if(playerSelection[j.id]==='b'){card.classList.add('sel-b');tEl.textContent='Equipo B';tEl.style.color='var(--naranja)';}
+    else if(playerSelection[j.id]==='b'){card.classList.add('sel-b');tEl.textContent='Equipo B';tEl.style.color='var(--rojo)';}
     else{tEl.textContent='—';tEl.style.color='';}
   });
   document.getElementById('btn-confirmar').disabled=(cA!==7||cB!==7);
@@ -717,12 +816,14 @@ function clearSelection(){playerSelection={};updateSelectionUI();}
 async function confirmarEquipos(){
   const fecha=document.getElementById('partido-fecha-paso1').value;
   if(!fecha){alert('Seleccioná la fecha');return;}
+  const nombreA=document.getElementById('nombre-equipo-a').value.trim()||'Equipo A';
+  const nombreB=document.getElementById('nombre-equipo-b').value.trim()||'Equipo B';
   const teamA=Object.entries(playerSelection).filter(([,v])=>v==='a').map(([id])=>parseInt(id));
   const teamB=Object.entries(playerSelection).filter(([,v])=>v==='b').map(([id])=>parseInt(id));
   const btn=document.getElementById('btn-confirmar');
   btn.disabled=true;btn.textContent='Guardando...';
   if(sb){
-    const{data:pData,error:pErr}=await sb.from('partidos').insert({fecha,equipo_a:'Equipo A',equipo_b:'Equipo B',goles_a:0,goles_b:0,estado:'pendiente',mvp_abierto:false}).select().single();
+    const{data:pData,error:pErr}=await sb.from('partidos').insert({fecha,equipo_a:nombreA,equipo_b:nombreB,goles_a:0,goles_b:0,estado:'pendiente',mvp_abierto:false}).select().single();
     if(pErr){alert('Error: '+pErr.message);btn.disabled=false;btn.textContent='Confirmar equipos →';return;}
     await sb.from('partido_jugadores').insert([
       ...teamA.map(id=>({partido_id:pData.id,jugador_id:id,equipo:'a',goles:0})),
@@ -731,7 +832,7 @@ async function confirmarEquipos(){
     await loadData();
   }else{
     const pid=Math.max(0,...partidos.map(p=>p.id))+1;
-    partidos.push({id:pid,fecha,equipo_a:'Equipo A',equipo_b:'Equipo B',goles_a:0,goles_b:0,resultado:null,estado:'pendiente',mvp_abierto:false,mvp_cierre:null});
+    partidos.push({id:pid,fecha,equipo_a:nombreA,equipo_b:nombreB,goles_a:0,goles_b:0,resultado:null,estado:'pendiente',mvp_abierto:false,mvp_cierre:null});
     [...teamA.map(id=>({partido_id:pid,jugador_id:id,equipo:'a',goles:0})),...teamB.map(id=>({partido_id:pid,jugador_id:id,equipo:'b',goles:0}))].forEach(r=>stats.push(r));
   }
   btn.textContent='Confirmar equipos →';btn.disabled=false;
@@ -753,15 +854,19 @@ function renderPartidoPendienteAdmin(){
   }
   document.getElementById('swap-teams-view').innerHTML=`
     <div class="g2">
-      <div><div style="font-family:'Barlow Condensed';font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--azul);margin-bottom:8px">Equipo A</div>${swapRows(jugA,'a')}</div>
-      <div><div style="font-family:'Barlow Condensed';font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--naranja);margin-bottom:8px">Equipo B</div>${swapRows(jugB,'b')}</div>
+      <div><div style="font-family:'Barlow Condensed';font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--azul);margin-bottom:8px">${pp.equipo_a||'Equipo A'}</div>${swapRows(jugA,'a')}</div>
+      <div><div style="font-family:'Barlow Condensed';font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--rojo);margin-bottom:8px">${pp.equipo_b||'Equipo B'}</div>${swapRows(jugB,'b')}</div>
     </div>`;
-  function teamColRes(jugs,label,team){
-    return`<div class="team-col"><div class="team-col-title ${team}">${label}</div>${jugs.map(s=>{const j=getJ(s.jugador_id);return`<div class="team-player-row"><div class="team-player-left">${avHtml(j.nombre,j.color,'26px','10px')}<span>${j.nombre}</span></div><input type="number" class="gol-input" id="goles-${s.jugador_id}" value="0" min="0" max="20"></div>`;}).join('')}</div>`;
+  function teamColRes(jugs,label,team,colorLabel){
+    return`<div class="team-col"><div class="team-col-title" style="color:${colorLabel}">${label}</div>${jugs.map(s=>{const j=getJ(s.jugador_id);return`<div class="team-player-row"><div class="team-player-left">${avHtml(j.nombre,j.color,'26px','10px')}<span>${j.nombre}</span></div><input type="number" class="gol-input" id="goles-${s.jugador_id}" value="0" min="0" max="20"></div>`;}).join('')}</div>`;
   }
-  document.getElementById('team-builder-resultado').innerHTML=teamColRes(jugA,'Equipo A','a')+'<div class="vs-badge">VS</div>'+teamColRes(jugB,'Equipo B','b');
+  document.getElementById('team-builder-resultado').innerHTML=teamColRes(jugA,pp.equipo_a||'Equipo A','a','var(--azul)')+'<div class="vs-badge">VS</div>'+teamColRes(jugB,pp.equipo_b||'Equipo B','b','var(--rojo)');
   selectedResult=null;
   document.getElementById('save-alert').innerHTML='';
+  // Update result button labels with actual team names
+  const resButtons=document.querySelectorAll('.res-btn:not(.edit-res-btn)');
+  if(resButtons[0])resButtons[0].textContent='Ganó '+(pp.equipo_a||'Equipo A');
+  if(resButtons[2])resButtons[2].textContent='Ganó '+(pp.equipo_b||'Equipo B');
 }
 
 function openSwap(jidSale,equipo){
@@ -866,6 +971,92 @@ function showConfirm(title,msg,onOk){
   openOverlay('modal-confirm');
 }
 
+function renderHistorialAdmin(){
+  const el=document.getElementById('historial-admin-list');
+  const fin=[...partidos].filter(p=>p.estado==='finalizado').sort((a,b)=>new Date(b.fecha)-new Date(a.fecha));
+  if(!fin.length){el.innerHTML='<div style="color:var(--muted);font-size:13px;padding:20px 0">No hay partidos finalizados</div>';return;}
+  el.innerHTML=fin.map(p=>`
+    <div style="background:var(--dark3);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)">${formatFechaLarga(p.fecha)}</div>
+          <div style="font-size:15px;font-weight:700;margin-top:3px">${p.equipo_a||'Equipo A'} ${p.goles_a} — ${p.goles_b} ${p.equipo_b||'Equipo B'}</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-secondary" style="padding:5px 12px;font-size:11px" onclick="abrirEditarPartido(${p.id})">✏️ Editar</button>
+          <button class="btn btn-danger" style="padding:5px 12px;font-size:11px" onclick="borrarPartido(${p.id})">🗑 Borrar</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+async function borrarPartido(pid){
+  if(!confirm('¿Borrar este partido? Se eliminarán todos los goles y votos MVP asociados.'))return;
+  if(sb){
+    await sb.from('mvp_votos').delete().eq('partido_id',pid);
+    await sb.from('partido_jugadores').delete().eq('partido_id',pid);
+    const{error}=await sb.from('partidos').delete().eq('id',pid);
+    if(error){alert('Error: '+error.message);return;}
+    await loadData();
+  }else{
+    mvpVotos=mvpVotos.filter(v=>v.partido_id!==pid);
+    stats=stats.filter(s=>s.partido_id!==pid);
+    partidos=partidos.filter(p=>p.id!==pid);
+  }
+  renderHistorialAdmin();renderTabla();renderPartidos();
+}
+
+function abrirEditarPartido(pid){
+  const p=partidos.find(x=>x.id===pid);if(!p)return;
+  const jugA=stats.filter(s=>s.partido_id===pid&&s.equipo==='a');
+  const jugB=stats.filter(s=>s.partido_id===pid&&s.equipo==='b');
+  window._editPid=pid;
+
+  function teamColEdit(jugs,label,team,colorTeam){
+    return`<div class="team-col"><div class="team-col-title" style="color:${colorTeam}">${label}</div>${jugs.map(s=>{const j=getJ(s.jugador_id);return`<div class="team-player-row"><div class="team-player-left">${avHtml(j.nombre,j.color,'26px','10px')}<span>${j.nombre}</span></div><input type="number" class="gol-input" id="edit-goles-${s.jugador_id}" value="${s.goles||0}" min="0" max="20"></div>`;}).join('')}</div>`;
+  }
+
+  document.getElementById('edit-partido-title').textContent=formatFechaLarga(p.fecha);
+  document.getElementById('edit-team-builder').innerHTML=
+    teamColEdit(jugA,p.equipo_a||'Equipo A','a','var(--azul)')+'<div class="vs-badge">VS</div>'+teamColEdit(jugB,p.equipo_b||'Equipo B','b','var(--rojo)');
+
+  // Set result buttons
+  window._editResult=p.resultado;
+  document.querySelectorAll('.edit-res-btn').forEach(b=>b.classList.remove('sel-a','sel-draw','sel-b'));
+  const active=document.querySelector(`.edit-res-btn[data-res="${p.resultado}"]`);
+  if(active)active.classList.add('sel-'+p.resultado);
+
+  openOverlay('modal-editar');
+}
+
+async function guardarEdicion(){
+  const pid=window._editPid;
+  const p=partidos.find(x=>x.id===pid);if(!p)return;
+  if(!window._editResult){alert('Seleccioná el resultado');return;}
+  const jugA=stats.filter(s=>s.partido_id===pid&&s.equipo==='a');
+  const jugB=stats.filter(s=>s.partido_id===pid&&s.equipo==='b');
+  const golesA=jugA.reduce((s,x)=>s+(parseInt(document.getElementById('edit-goles-'+x.jugador_id)?.value)||0),0);
+  const golesB=jugB.reduce((s,x)=>s+(parseInt(document.getElementById('edit-goles-'+x.jugador_id)?.value)||0),0);
+
+  const btn=document.getElementById('btn-guardar-edicion');
+  btn.disabled=true;btn.textContent='Guardando...';
+
+  if(sb){
+    await sb.from('partidos').update({goles_a:golesA,goles_b:golesB,resultado:window._editResult}).eq('id',pid);
+    for(const s of [...jugA,...jugB]){
+      const g=parseInt(document.getElementById('edit-goles-'+s.jugador_id)?.value)||0;
+      await sb.from('partido_jugadores').update({goles:g}).eq('partido_id',pid).eq('jugador_id',s.jugador_id);
+    }
+    await loadData();
+  }else{
+    p.goles_a=golesA;p.goles_b=golesB;p.resultado=window._editResult;
+    [...jugA,...jugB].forEach(s=>{const row=stats.find(x=>x.partido_id===pid&&x.jugador_id===s.jugador_id);if(row)row.goles=parseInt(document.getElementById('edit-goles-'+s.jugador_id)?.value)||0;});
+  }
+  btn.disabled=false;btn.textContent='Guardar cambios';
+  closeModalById('modal-editar');
+  renderHistorialAdmin();renderTabla();renderPartidos();renderJugadores();
+}
+
 async function agregarJugador(){
   const nombre=document.getElementById('new-nombre').value.trim();
   const apodo=document.getElementById('new-apodo').value.trim();
@@ -910,6 +1101,12 @@ async function cerrarVotacion(){
   }
   partidoAbierto=null;
   renderMvpAdminStatus();renderTabla();
+}
+
+function selectEditResult(res,btn){
+  window._editResult=res;
+  document.querySelectorAll('.edit-res-btn').forEach(b=>b.classList.remove('sel-a','sel-draw','sel-b'));
+  btn.classList.add('sel-'+res);
 }
 
 function openOverlay(id){document.getElementById(id).classList.add('open');}

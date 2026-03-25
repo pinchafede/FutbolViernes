@@ -11,7 +11,7 @@ const CONFIG = {
 
   // Clave pública (anon key) de Supabase — es segura para el frontend
   // Encontrala en: Project Settings → API → anon public
-  SUPABASE_KEY: "39553606Fede!",
+  SUPABASE_KEY: "sb_publishable_zzzrruOZwIluG0Haafdo2g_3A2lkUQs",
 
   // Contraseña del panel de admin
   ADMIN_PASSWORD: "Admin1234",

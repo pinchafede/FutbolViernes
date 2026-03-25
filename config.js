@@ -1,19 +1,22 @@
 // ============================================================
-//  CONFIGURACIÓN DE VIERNES FC
-//  Completá estos datos para conectar tu Google Sheet
+//  CONFIGURACIÓN — VIERNES FC
+//  Completá con tus datos de Supabase
 // ============================================================
 
 const CONFIG = {
 
-  // ID de tu Google Sheet (lo encontrás en la URL de la planilla)
-  // Ejemplo: https://docs.google.com/spreadsheets/d/AQUI_VA_EL_ID/edit
-  SHEET_ID: "1mlmpcrHfn8lTU2D9s6TZJJ5RI_OLoJHVagZmBTgxYK0",
+  // URL de tu proyecto Supabase
+  // Encontrala en: Project Settings → API → Project URL
+  SUPABASE_URL: "",
 
-  // API Key de Google Cloud (Google Sheets API)
-  // Ver instrucciones en la pestaña "Setup" de la app
-  API_KEY: "AIzaSyBiNLOZIXqu_C_m70JqlNsmrDnkgbEoJ5g",
+  // Clave pública (anon key) de Supabase — es segura para el frontend
+  // Encontrala en: Project Settings → API → anon public
+  SUPABASE_KEY: "",
 
-  // Nombre de la temporada (aparece en el header)
-  SEASON: "2026",
+  // Contraseña del panel de admin
+  ADMIN_PASSWORD: "viernes2025",
+
+  // Temporada actual (solo visual)
+  SEASON: "2025",
 
 };

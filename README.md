@@ -1,67 +1,47 @@
-# ⚽ Viernes FC — App de Estadísticas
+# ⚽ Viernes FC — v2
 
-App de estadísticas para el fútbol del viernes. Construida con HTML/JS puro, hosteable gratis en **GitHub Pages**, con datos en **Google Sheets**.
+App completa de estadísticas para el fútbol del viernes. GitHub Pages + Supabase, 100% gratis.
 
-## 🚀 Setup rápido
+## 🚀 Setup en 3 pasos
 
-### 1. Subir a GitHub Pages
+### 1. Crear las tablas en Supabase
+1. Entrá a [supabase.com](https://supabase.com) → tu proyecto
+2. SQL Editor → New query
+3. Pegá el contenido de `supabase_setup.sql` → Run
 
-1. Creá un repo en GitHub (público o privado)
-2. Subí `index.html` y `config.js`
-3. Settings → Pages → Branch: `main` → Save
-4. Tu app estará en: `https://tuusuario.github.io/nombre-del-repo`
-
-### 2. Crear el Google Sheet
-
-Creá una planilla con **3 solapas**:
-
-#### Hoja: `jugadores`
-| nombre | apodo | color |
-|--------|-------|-------|
-| Martín | Toto | #C8F500 |
-| Lucas | Luki | #00C8FF |
-
-#### Hoja: `partidos`
-| fecha | equipo_a | equipo_b | goles_a | goles_b | mvp | notas |
-|-------|----------|----------|---------|---------|-----|-------|
-| Vie 07/03 | Los Pibes | Los Cracks | 5 | 3 | Martín | |
-
-#### Hoja: `stats`
-| fecha | jugador | goles | asistencias | equipo |
-|-------|---------|-------|-------------|--------|
-| Vie 07/03 | Martín | 3 | 1 | Los Pibes |
-
-### 3. Hacer la planilla pública
-
-Compartir → "Cualquier persona con el enlace puede ver"
-
-### 4. Obtener API Key
-
-1. [console.cloud.google.com](https://console.cloud.google.com)
-2. Crear proyecto → Activar **Google Sheets API**
-3. Credenciales → Crear clave de API → Copiar
-
-### 5. Configurar `config.js`
-
+### 2. Completar `config.js`
 ```js
 const CONFIG = {
-  SHEET_ID: "tu_id_aqui",
-  API_KEY:  "tu_api_key_aqui",
-  SEASON:   "2025",
+  SUPABASE_URL:     "https://xxxx.supabase.co",
+  SUPABASE_KEY:     "eyJ...",       // anon/public key
+  ADMIN_PASSWORD:   "tu-contraseña",
+  SEASON:           "2025",
 };
 ```
+Encontrás la URL y KEY en: Supabase → Project Settings → API
+
+### 3. Subir a GitHub Pages
+1. Subí `index.html` y `config.js` al repo
+2. Settings → Pages → Branch main → Save
+3. Listo en `tuusuario.github.io/viernes-fc`
 
 ## 📊 Sistema de puntos
-
 | Acción | Puntos |
 |--------|--------|
-| Gol | 3 pts |
-| Asistencia | 1 pt |
-| MVP del partido | 5 pts |
+| Victoria | 3 pts |
+| Empate | 1 pt |
+| Derrota | 0 pts |
+| Cada 4 partidos jugados | +1 pt bonus |
+
+## 🏆 Rankings de honor (sin efecto en tabla)
+- Goleador del año
+- MVP más votado del año
 
 ## 📅 Flujo semanal
-
-1. Se juega el viernes
-2. El admin agrega filas en la hoja `stats` (una por jugador que participó)
-3. El admin completa la fila en `partidos` con el resultado y MVP
-4. La app se actualiza automáticamente ✅
+1. Abrís el panel Admin en la app (con contraseña)
+2. Seleccionás los 14 que juegan y los asignás a cada equipo
+3. Después del partido, cargás los goles de cada uno
+4. Seleccionás el resultado → se guarda y abre la votación MVP
+5. Mandás el link al grupo de WhatsApp
+6. Todos entran, ven la tabla y votan el MVP
+7. Desde Admin cerrás la votación cuando quieras

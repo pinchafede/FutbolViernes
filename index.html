@@ -798,10 +798,16 @@ async function cancelarPartidoPendiente(){
   if(!confirm('¿Cancelar el partido? Se borrarán los equipos confirmados.'))return;
   const pp=partidos.find(p=>p.estado==='pendiente');if(!pp)return;
   if(sb){
-    await sb.from('partido_jugadores').delete().eq('partido_id',pp.id);
-    await sb.from('partidos').delete().eq('id',pp.id);
+    const{error:e1}=await sb.from('partido_jugadores').delete().eq('partido_id',pp.id);
+    if(e1){alert('Error al borrar jugadores: '+e1.message);return;}
+    const{error:e2}=await sb.from('partidos').delete().eq('id',pp.id);
+    if(e2){alert('Error al borrar partido: '+e2.message);return;}
     await loadData();
-  }else{partidos=partidos.filter(p=>p.id!==pp.id);stats=stats.filter(s=>s.partido_id!==pp.id);}
+  }else{
+    partidos=partidos.filter(p=>p.id!==pp.id);
+    stats=stats.filter(s=>s.partido_id!==pp.id);
+  }
+  partidoPendiente=null;
   renderTabla();renderPartidos();renderAdminPartidoTab();
 }
 
@@ -833,10 +839,12 @@ async function _doGuardar(pp,jugA,jugB,golesA,golesB){
   cierre.setDate(cierre.getDate()+(cierre.getDay()===5?0:0));
   cierre.setHours(cierre.getHours()+24);
   if(sb){
-    await sb.from('partidos').update({goles_a:golesA,goles_b:golesB,resultado:selectedResult,estado:'finalizado',mvp_abierto:true,mvp_cierre:cierre.toISOString()}).eq('id',pp.id);
+    const{error:pErr}=await sb.from('partidos').update({goles_a:golesA,goles_b:golesB,resultado:selectedResult,estado:'finalizado',mvp_abierto:true,mvp_cierre:cierre.toISOString()}).eq('id',pp.id);
+    if(pErr){alert('Error al guardar partido: '+pErr.message);btn.disabled=false;btn.textContent='Guardar resultado y abrir MVP →';return;}
     for(const s of [...jugA,...jugB]){
       const g=parseInt(document.getElementById('goles-'+s.jugador_id)?.value)||0;
-      await sb.from('partido_jugadores').update({goles:g}).eq('partido_id',pp.id).eq('jugador_id',s.jugador_id);
+      const{error:gErr}=await sb.from('partido_jugadores').update({goles:g}).eq('partido_id',pp.id).eq('jugador_id',s.jugador_id);
+      if(gErr){console.error('Error guardando goles de jugador',s.jugador_id,gErr);}
     }
     await loadData();
     partidoAbierto=partidos.find(p=>p.mvp_abierto)||null;
@@ -892,8 +900,15 @@ async function renderMvpAdminStatus(){
 }
 async function cerrarVotacion(){
   if(!partidoAbierto)return;
-  if(sb){await sb.from('partidos').update({mvp_abierto:false}).eq('id',partidoAbierto.id);await loadData();}
-  else{const p=partidos.find(x=>x.id===partidoAbierto.id);if(p)p.mvp_abierto=false;partidoAbierto=null;}
+  if(sb){
+    const{error}=await sb.from('partidos').update({mvp_abierto:false}).eq('id',partidoAbierto.id);
+    if(error){alert('Error al cerrar votación: '+error.message);return;}
+    await loadData();
+  }else{
+    const p=partidos.find(x=>x.id===partidoAbierto.id);
+    if(p)p.mvp_abierto=false;
+  }
+  partidoAbierto=null;
   renderMvpAdminStatus();renderTabla();
 }
 

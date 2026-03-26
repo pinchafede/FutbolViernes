@@ -215,6 +215,12 @@ nav button.active{color:var(--negro);background:var(--verde);}
   .jgrid{grid-template-columns:1fr 1fr;}.pb-teams{grid-template-columns:1fr;}.pb-vs{display:none;}
 }
 </style>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#080808">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Fuchibol">
+  <link rel="apple-touch-icon" href="icon-192.png">
 </head>
 <body>
 
@@ -268,7 +274,11 @@ nav button.active{color:var(--negro);background:var(--verde);}
 
 <!-- JUGADORES -->
 <div class="page" id="page-jugadores">
-  <div class="ph"><div class="ph-title">PLANTEL <span>COMPLETO</span></div><div class="ph-sub">Hacé click para ver el historial</div></div>
+  <div class="ph"><div class="ph-title">PLANTEL <span>COMPLETO</span></div><div class="ph-sub">Hacé click para ver el historial · ⚔️ Comparar para enfrentar dos jugadores</div></div>
+  <div id="comp-hint-bar" style="display:none;background:rgba(77,159,255,0.08);border:1px solid rgba(77,159,255,0.25);border-radius:8px;padding:12px 16px;margin-bottom:16px;display:none;align-items:center;justify-content:space-between;gap:12px">
+    <div style="font-size:13px;color:var(--azul)">⚔️ <span id="comp-hint-text">Seleccioná un segundo jugador para comparar</span></div>
+    <button class="btn btn-secondary" style="padding:5px 12px;font-size:11px" onclick="resetComparison()">Cancelar</button>
+  </div>
   <div class="jgrid" id="jugadores-grid"><div class="loading"><div class="spinner"></div></div></div>
 </div>
 
@@ -808,6 +818,7 @@ function renderPartidos(){
         ${p.resultado==='draw'?'<span class="chip">Empate</span>':`<span class="chip win">Ganó ${p.resultado==='a'?p.equipo_a||'Equipo A':p.equipo_b||'Equipo B'}</span>`}
         ${mvpW?`<span class="chip mvp">⭐ MVP: ${getJ(mvpW).nombre}</span>`:''}
         ${scorers.map(s=>`<span class="chip">⚽ ${getJ(s.jugador_id).nombre} (${s.goles})</span>`).join('')}
+        <button onclick="compartirPartido(${p.id})" style="margin-left:auto;background:none;border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--muted);cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#25D366';this.style.color='#25D366'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">📲 Compartir</button>
       </div>
     </div>`;
   }).join('');
@@ -1009,9 +1020,19 @@ function renderPartidoPendienteAdmin(){
   const jugA=stats.filter(s=>s.partido_id===pp.id&&s.equipo==='a');
   const jugB=stats.filter(s=>s.partido_id===pp.id&&s.equipo==='b');
   document.getElementById('partido-pendiente-info').innerHTML=`
-    <div class="alert alert-warning" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+    <div class="alert alert-warning" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
       <span>⏳ Partido pendiente · ${formatFechaLarga(pp.fecha)}</span>
       <button class="btn btn-danger" style="padding:5px 12px;font-size:11px" onclick="cancelarPartidoPendiente()">Cancelar partido</button>
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:4px">
+      <div class="input-group">
+        <label class="input-label" style="color:var(--azul)">Nombre Equipo A</label>
+        <input type="text" class="input" id="edit-equipo-a" value="${pp.equipo_a||'Equipo A'}" maxlength="20" onblur="guardarNombreEquipo()">
+      </div>
+      <div class="input-group">
+        <label class="input-label" style="color:var(--rojo)">Nombre Equipo B</label>
+        <input type="text" class="input" id="edit-equipo-b" value="${pp.equipo_b||'Equipo B'}" maxlength="20" onblur="guardarNombreEquipo()">
+      </div>
     </div>`;
   function swapRows(jugs,equipo){
     return jugs.map(s=>{const j=getJ(s.jugador_id);return`<div class="swap-row"><div style="display:flex;align-items:center;gap:8px">${avHtml(j.nombre,j.color)}<span style="font-size:14px;font-weight:600">${j.nombre}</span></div><button class="swap-btn" onclick="openSwap(${s.jugador_id},'${equipo}')">Reemplazar</button></div>`;}).join('');
@@ -1124,6 +1145,7 @@ async function _doGuardar(pp,jugA,jugB,golesA,golesB){
     partidoAbierto=partidos.find(x=>x.id===pp.id&&x.mvp_abierto)||null;
   }
   document.getElementById('save-alert').innerHTML='<div class="alert alert-success">¡Partido guardado! Votación MVP abierta por 24hs ✅</div>';
+  startMvpRefresh();
   renderTabla();renderPartidos();renderJugadores();
   setTimeout(()=>{selectedResult=null;btn.disabled=false;btn.textContent='Guardar resultado y abrir MVP →';renderAdminPartidoTab();},2000);
 }
@@ -1283,6 +1305,7 @@ async function cerrarVotacion(){
     if(p)p.mvp_abierto=false;
   }
   partidoAbierto=null;
+  stopMvpRefresh();
   renderMvpAdminStatus();renderTabla();
 }
 
@@ -1293,6 +1316,20 @@ function selectEditResult(res,btn){
 }
 
 // ── TEMPORADAS ──
+// ── EDIT TEAM NAMES ──
+async function guardarNombreEquipo(){
+  const pp=partidos.find(p=>p.estado==='pendiente');if(!pp)return;
+  const nombreA=document.getElementById('edit-equipo-a')?.value.trim()||'Equipo A';
+  const nombreB=document.getElementById('edit-equipo-b')?.value.trim()||'Equipo B';
+  if(sb){
+    await sb.from('partidos').update({equipo_a:nombreA,equipo_b:nombreB}).eq('id',pp.id);
+    await loadData();
+  }else{
+    pp.equipo_a=nombreA; pp.equipo_b=nombreB;
+  }
+  renderTabla(); // refresh banner
+}
+
 // ── GESTIÓN JUGADORES ──
 let editJugadorId = null;
 
@@ -1414,29 +1451,69 @@ function selectForComparison(jid){
   if(!p)return;
   if(!compSelA){
     compSelA=p;
-    updateComparBtn(jid,'a');
   } else if(!compSelB&&compSelA.id!==jid){
     compSelB=p;
-    updateComparBtn(jid,'b');
     openComparador();
-  } else if(compSelA.id===jid||compSelB?.id===jid){
-    // deselect
-    if(compSelA?.id===jid){compSelA=compSelB;compSelB=null;updateComparBtn(jid,'none');}
-    else{compSelB=null;updateComparBtn(jid,'none');}
+  } else if(compSelA.id===jid){
+    compSelA=compSelB;compSelB=null;
+  } else if(compSelB?.id===jid){
+    compSelB=null;
   } else {
-    // replace A with new selection, shift
-    if(compSelA) updateComparBtn(compSelA.id,'none');
-    compSelA=compSelB;compSelB=p;
-    updateComparBtn(jid,'b');
+    if(compSelA) compSelA=compSelB;
+    compSelB=p;
     if(compSelA&&compSelB) openComparador();
   }
-  // Update all btn labels
+  updateAllComparBtns();
+  updateCompHintBar();
+}
+
+function updateAllComparBtns(){
   document.querySelectorAll('[id^="cmp-"]').forEach(btn=>{
     const id=parseInt(btn.id.replace('cmp-',''));
-    if(id===compSelA?.id) btn.classList.add('sel-a'), btn.classList.remove('sel-b'), btn.textContent='🔵 Jugador A';
-    else if(id===compSelB?.id) btn.classList.add('sel-b'), btn.classList.remove('sel-a'), btn.textContent='🔴 Jugador B';
-    else btn.classList.remove('sel-a','sel-b'), btn.textContent='⚔️ Comparar';
+    btn.classList.remove('sel-a','sel-b');
+    if(id===compSelA?.id){btn.classList.add('sel-a');btn.textContent='🔵 Jugador A';}
+    else if(id===compSelB?.id){btn.classList.add('sel-b');btn.textContent='🔴 Jugador B';}
+    else btn.textContent='⚔️ Comparar';
   });
+}
+
+function updateCompHintBar(){
+  const bar=document.getElementById('comp-hint-bar');
+  if(!bar)return;
+  if(compSelA&&!compSelB){
+    bar.style.display='flex';
+    document.getElementById('comp-hint-text').textContent=`${compSelA.nombre} seleccionado — elegí un segundo jugador para comparar`;
+  } else {
+    bar.style.display='none';
+  }
+}
+
+// ── COMPARTIR WHATSAPP ──
+function compartirPartido(pid){
+  const p=partidos.find(x=>x.id===pid);if(!p)return;
+  const equipoGanador=p.resultado==='draw'?null:p.resultado==='a'?p.equipo_a||'Equipo A':p.equipo_b||'Equipo B';
+  const scorers=stats.filter(s=>s.partido_id===pid&&s.goles>0).sort((a,b)=>b.goles-a.goles);
+  const mvpW=getMvpWinner(pid);
+
+  let txt=`⚽ *Fuchibol Reformed*\n`;
+  txt+=`📅 ${formatFechaLarga(p.fecha)}\n\n`;
+  txt+=`*${p.equipo_a||'Equipo A'}* ${p.goles_a} — ${p.goles_b} *${p.equipo_b||'Equipo B'}*\n`;
+  txt+=p.resultado==='draw'?`🤝 Empate\n`:`🏆 Ganó *${equipoGanador}*\n`;
+  if(mvpW) txt+=`⭐ MVP: *${getJ(mvpW).nombre}*\n`;
+  if(scorers.length){
+    txt+=`\n⚽ Goles:\n`;
+    scorers.forEach(s=>{ txt+=`  • ${getJ(s.jugador_id).nombre} (${s.goles})\n`; });
+  }
+  txt+=`\n📊 ${window.location.href}`;
+
+  const url=`https://wa.me/?text=${encodeURIComponent(txt)}`;
+  window.open(url,'_blank');
+}
+
+function resetComparison(){
+  compSelA=null;compSelB=null;
+  updateAllComparBtns();
+  updateCompHintBar();
 }
 
 function updateComparBtn(jid,slot){
@@ -1563,6 +1640,35 @@ function openOverlay(id){document.getElementById(id).classList.add('open');}
 function closeModalById(id){document.getElementById(id).classList.remove('open');}
 function closeModal(id,e){if(e.target===document.getElementById(id))closeModalById(id);}
 
+// ── AUTO-REFRESH MVP ──
+let mvpRefreshInterval = null;
+
+function startMvpRefresh(){
+  if(mvpRefreshInterval) return;
+  mvpRefreshInterval = setInterval(async()=>{
+    if(!partidoAbierto) { stopMvpRefresh(); return; }
+    // Check auto-close
+    if(partidoAbierto.mvp_cierre && new Date() > new Date(partidoAbierto.mvp_cierre)){
+      stopMvpRefresh();
+      await checkMvpAutoClose();
+      renderTabla();
+      return;
+    }
+    // Refresh votes silently
+    if(sb){
+      const{data:freshVotos}=await sb.from('mvp_votos').select('*');
+      if(freshVotos){ mvpVotos=freshVotos; }
+    }
+    // Update MVP tab if open
+    const mvpTab=document.getElementById('tab-mvp-admin');
+    if(mvpTab&&mvpTab.style.display!=='none') renderMvpAdminStatus();
+  }, 30000); // every 30s
+}
+
+function stopMvpRefresh(){
+  if(mvpRefreshInterval){ clearInterval(mvpRefreshInterval); mvpRefreshInterval=null; }
+}
+
 async function init(){
   await loadData();
   await checkMvpAutoClose();
@@ -1573,8 +1679,16 @@ async function init(){
   if(activa) temporadaActual=activa.nombre;
   renderSeasonBar();
   renderTabla();renderPartidos();renderJugadores();
+  if(partidoAbierto) startMvpRefresh();
 }
 init();
+</script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
 </script>
 </body>
 </html>

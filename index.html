@@ -1269,7 +1269,25 @@ function renderTemporadasAdmin(){
         <div style="font-size:14px;font-weight:700">${t.nombre} ${t.activa?'🟢 Activa':''}</div>
         <div style="font-size:11px;color:var(--muted)">${partidos.filter(p=>p.temporada===t.nombre&&p.estado==='finalizado').length} partidos finalizados</div>
       </div>
+      ${!t.activa?`<button class="btn btn-danger" style="padding:5px 12px;font-size:11px" onclick="borrarTemporada(${t.id},'${t.nombre}')">🗑 Borrar</button>`:'<span style="font-size:11px;color:var(--muted)">Activa</span>'}
     </div>`).join('');
+}
+
+async function borrarTemporada(tid, nombre){
+  const nPartidos=partidos.filter(p=>p.temporada===nombre).length;
+  const msg=nPartidos>0
+    ?`¿Borrar la temporada "${nombre}"? Tiene ${nPartidos} partidos. Los partidos NO se borran, solo la temporada.`
+    :`¿Borrar la temporada "${nombre}"?`;
+  if(!confirm(msg))return;
+  if(sb){
+    const{error}=await sb.from('temporadas').delete().eq('id',tid);
+    if(error){alert('Error: '+error.message);return;}
+    await loadData();
+  }else{
+    temporadas=temporadas.filter(t=>t.id!==tid);
+  }
+  renderTemporadasAdmin();
+  renderSeasonBar();
 }
 
 async function cerrarTemporada(){
@@ -1405,15 +1423,23 @@ function renderComparador(){
   ];
   const barsHtml=barMetrics.map(m=>{
     const va=a[m.key]||0,vb=b[m.key]||0;
-    const total=va+vb||1;
-    const pctA=Math.round(va/total*100);
-    const pctB=100-pctA;
-    const adom=va>vb,bdom=vb>va;
-    return `<div class="comp-bar-section">
-      <div class="comp-bar-title">${m.label}</div>
-      <div class="comp-bar-row">
-        <div class="comp-bar-a ${adom?'dominant':''}" style="width:${pctA}%;min-width:${va>0?'30px':'0'}">${va}</div>
-        <div class="comp-bar-b ${bdom?'dominant':''}" style="width:${pctB}%;min-width:${vb>0?'30px':'0'}">${vb}</div>
+    const maxVal=Math.max(va,vb,1);
+    const pctA=Math.round(va/maxVal*100);
+    const pctB=Math.round(vb/maxVal*100);
+    const aWins=va>vb, bWins=vb>va;
+    return `<div style="margin-bottom:14px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);text-align:center;margin-bottom:6px">${m.label}</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:36px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;color:${aWins?'var(--azul)':'var(--text-dim)'}">${va}</div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:3px">
+          <div style="height:10px;background:var(--dark4);border-radius:4px;overflow:hidden">
+            <div style="height:100%;width:${pctA}%;background:${aWins?'var(--azul)':'rgba(77,159,255,0.35)'};border-radius:4px;transition:width .4s ease"></div>
+          </div>
+          <div style="height:10px;background:var(--dark4);border-radius:4px;overflow:hidden">
+            <div style="height:100%;width:${pctB}%;background:${bWins?'var(--rojo)':'rgba(255,77,77,0.35)'};border-radius:4px;transition:width .4s ease"></div>
+          </div>
+        </div>
+        <div style="width:36px;font-family:'Bebas Neue',sans-serif;font-size:18px;color:${bWins?'var(--rojo)':'var(--text-dim)'}">${vb}</div>
       </div>
     </div>`;
   }).join('');

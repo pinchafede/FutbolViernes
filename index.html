@@ -463,6 +463,30 @@ nav button.active{color:var(--negro);background:var(--verde);}
   </div>
 </div>
 
+<!-- MODAL EDITAR JUGADOR -->
+<div class="overlay" id="modal-editar-jugador" onclick="closeModal('modal-editar-jugador',event)">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-top">
+      <div style="font-size:18px;font-weight:700">✏️ Editar jugador</div>
+      <button class="modal-close" onclick="closeModalById('modal-editar-jugador')">✕</button>
+    </div>
+    <div class="input-group" style="margin-bottom:12px">
+      <label class="input-label">Nombre</label>
+      <input type="text" class="input" id="edit-j-nombre" placeholder="Nombre">
+    </div>
+    <div class="input-group" style="margin-bottom:12px">
+      <label class="input-label">Apodo</label>
+      <input type="text" class="input" id="edit-j-apodo" placeholder="Apodo">
+    </div>
+    <div class="input-group" style="margin-bottom:20px">
+      <label class="input-label">Color</label>
+      <input type="color" class="input" id="edit-j-color" style="padding:4px;height:42px;cursor:pointer">
+    </div>
+    <div id="edit-j-alert" style="margin-bottom:10px"></div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="guardarEdicionJugador()">Guardar cambios</button>
+  </div>
+</div>
+
 <!-- MODAL COMPARADOR -->
 <div class="overlay" id="modal-comparador" onclick="closeModal('modal-comparador',event)">
   <div class="modal" style="max-width:600px">
@@ -584,7 +608,7 @@ async function loadData(){
   if(!sb){jugadores=DEMO.jugadores;partidos=DEMO.partidos;stats=DEMO.stats;mvpVotos=DEMO.mvpVotos;return;}
   try{
     const[jR,pR,sR,mR,tR]=await Promise.all([
-      sb.from('jugadores').select('*').eq('activo',true).order('nombre'),
+      sb.from('jugadores').select('*').order('nombre'),
       sb.from('partidos').select('*').order('fecha',{ascending:false}),
       sb.from('partido_jugadores').select('*'),
       sb.from('mvp_votos').select('*'),
@@ -791,7 +815,7 @@ function renderPartidos(){
 
 function renderJugadores(){
   const sorted=computePlayerStats();
-  const allJ=jugadores.map(j=>sorted.find(s=>s.id===j.id)||{...j,pj:0,goles:0,pts:0,mvps:0});
+  const allJ=jugadores.filter(j=>j.activo!==false).map(j=>sorted.find(s=>s.id===j.id)||{...j,pj:0,goles:0,pts:0,mvps:0});
   document.getElementById('jugadores-grid').innerHTML=allJ.map(p=>`
     <div class="jcard" onclick="openJugadorModal(${p.id})">
       <div class="av" style="width:60px;height:60px;font-size:22px;background:rgba(${hexRgb(p.color)},.12);border-color:${p.pj>0?p.color:'var(--border)'};color:${p.color};margin:0 auto 12px">${initials(p.nombre)}</div>
@@ -920,7 +944,7 @@ function renderAdminPartidoTab(){
 }
 
 function renderPlayerSelectGrid(){
-  document.getElementById('player-select-grid').innerHTML=jugadores.map(j=>`
+  document.getElementById('player-select-grid').innerHTML=jugadores.filter(j=>j.activo!==false).map(j=>`
     <div class="ps-card" id="ps-${j.id}" onclick="togglePlayerSelect(${j.id})">
       ${avHtml(j.nombre,j.color,'28px','10px')}
       <div><div class="ps-card-name">${j.nombre}</div><div class="ps-card-team" id="ps-team-${j.id}">—</div></div>
@@ -1210,9 +1234,21 @@ async function agregarJugador(){
 }
 function renderAdminJugadores(){
   document.getElementById('admin-jugadores-list').innerHTML=jugadores.map(j=>`
-    <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">
-      ${avHtml(j.nombre,j.color)}
-      <div><div style="font-size:14px;font-weight:600">${j.nombre}</div><div style="font-size:11px;color:var(--muted)">${j.apodo||''}</div></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:10px">
+        ${avHtml(j.nombre,j.color)}
+        <div>
+          <div style="font-size:14px;font-weight:600">${j.nombre} ${j.activo===false?'<span style="font-size:10px;color:var(--rojo);border:1px solid var(--rojo);border-radius:3px;padding:1px 5px;margin-left:4px">BAJA</span>':''}</div>
+          <div style="font-size:11px;color:var(--muted)">${j.apodo||''}</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-secondary" style="padding:4px 10px;font-size:11px" onclick="abrirEditarJugador(${j.id})">✏️ Editar</button>
+        ${j.activo!==false
+          ?`<button class="btn btn-danger" style="padding:4px 10px;font-size:11px" onclick="darDeBaja(${j.id})">⬇ Baja</button>`
+          :`<button class="btn btn-secondary" style="padding:4px 10px;font-size:11px" onclick="reactivarJugador(${j.id})">↑ Reactivar</button>`
+        }
+      </div>
     </div>`).join('');
 }
 
@@ -1257,6 +1293,60 @@ function selectEditResult(res,btn){
 }
 
 // ── TEMPORADAS ──
+// ── GESTIÓN JUGADORES ──
+let editJugadorId = null;
+
+function abrirEditarJugador(jid){
+  const j=jugadores.find(x=>x.id===jid);if(!j)return;
+  editJugadorId=jid;
+  document.getElementById('edit-j-nombre').value=j.nombre;
+  document.getElementById('edit-j-apodo').value=j.apodo||'';
+  document.getElementById('edit-j-color').value=j.color||'#C8F500';
+  document.getElementById('edit-j-alert').innerHTML='';
+  openOverlay('modal-editar-jugador');
+}
+
+async function guardarEdicionJugador(){
+  const nombre=document.getElementById('edit-j-nombre').value.trim();
+  const apodo=document.getElementById('edit-j-apodo').value.trim();
+  const color=document.getElementById('edit-j-color').value;
+  if(!nombre){document.getElementById('edit-j-alert').innerHTML='<div class="alert alert-error">El nombre es obligatorio</div>';return;}
+  if(sb){
+    const{error}=await sb.from('jugadores').update({nombre,apodo,color}).eq('id',editJugadorId);
+    if(error){document.getElementById('edit-j-alert').innerHTML=`<div class="alert alert-error">${error.message}</div>`;return;}
+    await loadData();
+  }else{
+    const j=jugadores.find(x=>x.id===editJugadorId);
+    if(j){j.nombre=nombre;j.apodo=apodo;j.color=color;}
+  }
+  closeModalById('modal-editar-jugador');
+  renderAdminJugadores();renderJugadores();renderPlayerSelectGrid();renderTabla();
+}
+
+async function darDeBaja(jid){
+  const j=jugadores.find(x=>x.id===jid);
+  if(!confirm(`¿Dar de baja a ${j?.nombre}? No aparecerá en la selección de equipos pero su historial se mantiene.`))return;
+  if(sb){
+    const{error}=await sb.from('jugadores').update({activo:false}).eq('id',jid);
+    if(error){alert('Error: '+error.message);return;}
+    await loadData();
+  }else{
+    const j=jugadores.find(x=>x.id===jid);if(j)j.activo=false;
+  }
+  renderAdminJugadores();renderJugadores();renderPlayerSelectGrid();
+}
+
+async function reactivarJugador(jid){
+  if(sb){
+    const{error}=await sb.from('jugadores').update({activo:true}).eq('id',jid);
+    if(error){alert('Error: '+error.message);return;}
+    await loadData();
+  }else{
+    const j=jugadores.find(x=>x.id===jid);if(j)j.activo=true;
+  }
+  renderAdminJugadores();renderJugadores();renderPlayerSelectGrid();
+}
+
 function renderTemporadasAdmin(){
   const activa=temporadas.find(t=>t.activa);
   document.getElementById('temporada-activa-info').innerHTML=activa
@@ -1367,7 +1457,7 @@ function openComparador(){
 function openPickerModal(slot){
   pickerSlot=slot;
   const sorted=computePlayerStats();
-  document.getElementById('picker-list').innerHTML=sorted.map(p=>`
+  document.getElementById('picker-list').innerHTML=sorted.filter(p=>p.activo!==false).map(p=>`
     <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="pickJugador(${p.id})">
       <div style="display:flex;align-items:center;gap:10px">${avHtml(p.nombre,p.color)}<span style="font-size:14px;font-weight:600">${p.nombre}</span></div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--verde)">${p.pts} pts</div>

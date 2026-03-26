@@ -1423,9 +1423,11 @@ function renderComparador(){
                metrics.filter(m=>m.reverse&&(a[m.key]||0)<(b[m.key]||0)).length;
   const bScore=metrics.filter(m=>!m.reverse&&(b[m.key]||0)>(a[m.key]||0)).length +
                metrics.filter(m=>m.reverse&&(b[m.key]||0)<(a[m.key]||0)).length;
+  const colorGanador=aScore>bScore?'var(--azul)':'var(--rojo)';
+  const nombreGanador=aScore>bScore?a.nombre:b.nombre;
   const winnerHtml=aScore===bScore
-    ?'<div style="text-align:center;font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--muted);margin-bottom:16px">ESTADÍSTICAS IGUALES</div>'
-    :`<div style="text-align:center;margin-bottom:16px"><span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--muted)">Ventaja en más stats: </span><span style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:${aScore>bScore?'var(--azul)':'var(--rojo)'}">${aScore>bScore?a.nombre:b.nombre}</span></div>`;
+    ?`<div style="text-align:center;font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--muted);margin-bottom:16px">ESTADÍSTICAS IGUALES</div>`
+    :`<div style="text-align:center;margin-bottom:16px"><span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--muted)">Ventaja en más stats: </span><span style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:${colorGanador}">${nombreGanador}</span></div>`;
 
   document.getElementById('comp-result').innerHTML=`
     ${winnerHtml}

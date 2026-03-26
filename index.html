@@ -208,9 +208,20 @@ nav button.active{color:var(--negro);background:var(--verde);}
 .btn-comparar.sel-a{border-color:var(--azul);color:var(--azul);background:rgba(77,159,255,.08);}
 .btn-comparar.sel-b{border-color:var(--rojo);color:var(--rojo);background:rgba(255,77,77,.08);}
 @media(max-width:768px){
-  header{padding:0 14px;}nav button{padding:6px 8px;font-size:11px;}
-  .page{padding:20px 14px;}.g2,.g4{grid-template-columns:1fr 1fr;}
-  .tabla-head,.tabla-row{grid-template-columns:36px 1fr 40px 40px 50px;}.col-pj{display:none;}.col-gest{display:none;}.col-bonus{display:none;}.col-goles{display:none;}
+  header{padding:0 10px;}
+  .logo{font-size:16px;letter-spacing:1.5px;}
+  nav button{padding:5px 7px;font-size:10px;letter-spacing:1px;}
+  .admin-btn{font-size:10px;padding:5px 8px;}
+  .page{padding:16px 12px;}
+  /* Rankings: stack vertically */
+  .g2{grid-template-columns:1fr;}
+  .g4{grid-template-columns:1fr 1fr;}
+  /* Tabla: show G E P + PTS, hide bonus and goles */
+  .tabla-head,.tabla-row{grid-template-columns:36px 1fr 36px 36px 36px 50px;}
+  .col-pj{display:none;}
+  .col-gest{display:table-cell;}
+  .col-bonus{display:none;}
+  .col-goles{display:none;}
   .team-builder{grid-template-columns:1fr;}.vs-badge{display:none;}
   .jgrid{grid-template-columns:1fr 1fr;}.pb-teams{grid-template-columns:1fr;}.pb-vs{display:none;}
 }

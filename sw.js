@@ -1,16 +1,19 @@
-const CACHE = 'fuchibol-v1';
+const CACHE = 'fuchibol-v2';
 const ASSETS = [
-  './',
   './index.html',
-  './config.js',
-  'https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;500;600;700&display=swap',
-  'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png',
+  './config.js'
 ];
 
 self.addEventListener('install', e => {
   e.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(ASSETS.map(u => new Request(u, {mode:'no-cors'}))))
-      .catch(() => {}) // don't fail install if cache misses
+    caches.open(CACHE).then(c => {
+      return Promise.allSettled(ASSETS.map(url => 
+        c.add(url).catch(() => console.log('Cache miss:', url))
+      ));
+    })
   );
   self.skipWaiting();
 });
@@ -25,16 +28,16 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // Network first for Supabase API calls
   if(e.request.url.includes('supabase.co')){
     e.respondWith(fetch(e.request).catch(() => new Response('{}',{headers:{'Content-Type':'application/json'}})));
     return;
   }
-  // Cache first for everything else
   e.respondWith(
     caches.match(e.request).then(cached => cached || fetch(e.request).then(res => {
-      const clone = res.clone();
-      caches.open(CACHE).then(c => c.put(e.request, clone));
+      if(res.ok){
+        const clone = res.clone();
+        caches.open(CACHE).then(c => c.put(e.request, clone));
+      }
       return res;
     }))
   );

@@ -1281,8 +1281,13 @@ async function borrarTemporada(tid, nombre){
   if(!confirm(msg))return;
   if(sb){
     const{error}=await sb.from('temporadas').delete().eq('id',tid);
-    if(error){alert('Error: '+error.message);return;}
-    await loadData();
+    if(error){
+      alert('Error al borrar: '+error.message+'. Puede que falte el permiso de delete en Supabase. Corré: CREATE POLICY "delete publico" ON temporadas FOR DELETE USING (true);');
+      return;
+    }
+    // Reload fresh from Supabase
+    const{data:tData}=await sb.from('temporadas').select('*').order('created_at',{ascending:false});
+    if(tData) temporadas=tData;
   }else{
     temporadas=temporadas.filter(t=>t.id!==tid);
   }
@@ -1457,15 +1462,11 @@ function renderComparador(){
 
   document.getElementById('comp-result').innerHTML=`
     ${winnerHtml}
-    <div style="display:flex;gap:10px;margin-bottom:12px">
+    <div style="display:flex;gap:10px;margin-bottom:14px">
       <div style="flex:1;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--azul)">← ${a.nombre}</div>
       <div style="flex:1;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--rojo)">${b.nombre} →</div>
     </div>
-    ${barsHtml}
-    <div style="margin-top:4px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;text-align:center">Detalle</div>
-      <div class="comp-stats-grid">${statsHtml}</div>
-    </div>`;
+    <div class="comp-stats-grid">${statsHtml}</div>`;
 }
 
 function openOverlay(id){document.getElementById(id).classList.add('open');}

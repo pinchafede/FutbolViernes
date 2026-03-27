@@ -342,7 +342,7 @@ nav button.active{color:var(--negro);background:var(--verde);}
           <div style="font-size:13px;color:var(--text-dim);margin-bottom:10px">Agregá jugadores a medida que se van anotando. Al llegar a 14 podés armar los equipos.</div>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px">
             <div id="anotados-fecha-info" style="font-family:'Barlow Condensed';font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)"></div>
-            <input type="date" class="input" id="anotados-fecha" style="max-width:180px;padding:7px 12px" onchange="renderAnotadosAdmin();renderAnotadosBanner()">
+            <input type="date" class="input" id="anotados-fecha" style="max-width:180px;padding:7px 12px" onchange="setAnotadosFecha(this.value);renderAnotadosAdmin();renderAnotadosBanner()">
           </div>
           <div id="anotados-admin-list" style="margin-bottom:14px"></div>
           <div class="admin-section-title" style="margin-top:16px">Agregar jugador a la lista</div>
@@ -987,7 +987,15 @@ function showAdminTab(tab,btn){
 function renderAdminPartidoTab(){
   partidoPendiente=partidos.find(p=>p.estado==='pendiente')||null;
   const fechaInput=document.getElementById('anotados-fecha');
-  if(fechaInput&&!fechaInput.value) fechaInput.value=getAnotadosFecha();
+  if(fechaInput){
+    // Only auto-set date if never set before — respect what admin already chose
+    if(!window._anotadosFecha&&!fechaInput.value){
+      const f=getNextFriday();
+      setAnotadosFecha(f);
+    } else if(window._anotadosFecha){
+      fechaInput.value=window._anotadosFecha;
+    }
+  }
   renderAnotadosAdmin();
   if(partidoPendiente){
     document.getElementById('admin-paso1').style.display='none';
@@ -1689,16 +1697,30 @@ function closeModal(id,e){if(e.target===document.getElementById(id))closeModalBy
 
 // ── ANOTADOS ──
 
-function getAnotadosFecha(){
-  // Use the stored date or next friday
-  const stored=document.getElementById('anotados-fecha')?.value;
-  if(stored) return stored;
+function getNextFriday(){
   const today=new Date();
   const day=today.getDay();
-  const daysUntilFriday=day<=5?(5-day):(12-day);
+  const daysUntilFriday=day===5?7:(5-day+7)%7||7; // next friday, not today if today is friday
+  if(day===5) return today.toISOString().split('T')[0]; // if today IS friday, use today
   const friday=new Date(today);
-  friday.setDate(today.getDate()+daysUntilFriday);
+  friday.setDate(today.getDate()+((5-day+7)%7));
   return friday.toISOString().split('T')[0];
+}
+
+function getAnotadosFecha(){
+  // Always read from the input field if it exists and has a value
+  const input=document.getElementById('anotados-fecha');
+  if(input&&input.value) return input.value;
+  // Otherwise use the state variable
+  if(window._anotadosFecha) return window._anotadosFecha;
+  // Last resort: calculate next friday
+  return getNextFriday();
+}
+
+function setAnotadosFecha(fecha){
+  window._anotadosFecha=fecha;
+  const input=document.getElementById('anotados-fecha');
+  if(input) input.value=fecha;
 }
 
 function renderAnotadosBanner(){
@@ -1743,7 +1765,7 @@ function renderAnotadosBanner(){
 }
 
 function renderAnotadosAdmin(){
-  const fecha=document.getElementById('anotados-fecha')?.value||getAnotadosFecha();
+  const fecha=getAnotadosFecha();
   const lista=anotados.filter(a=>a.fecha===fecha);
   const confirmados=lista.filter(a=>a.estado==='confirmado').sort((a,b)=>a.orden-b.orden);
   const suplentes=lista.filter(a=>a.estado==='suplente').sort((a,b)=>a.orden-b.orden);
@@ -1851,8 +1873,7 @@ async function promoverSuplente(aid){
 }
 
 function usarAnotadosParaEquipos(){
-  // Pre-fill the player selection with confirmed anotados
-  const fecha=document.getElementById('anotados-fecha')?.value||getAnotadosFecha();
+  const fecha=getAnotadosFecha();
   const confirmados=anotados.filter(a=>a.fecha===fecha&&a.estado==='confirmado').slice(0,14);
   if(confirmados.length<14){alert('Necesitás 14 confirmados para armar equipos. Tenés '+confirmados.length+'.');return;}
   // Set the fecha in paso1

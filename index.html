@@ -726,10 +726,11 @@ function computePlayerStats(){
     player.rachaVictorias=rachaVict;
   });
 
-  // Solo contar MVPs de votaciones ya cerradas
-  mvpVotos.forEach(v=>{
-    const par=partidos.find(x=>x.id===v.partido_id);
-    if(par&&!par.mvp_abierto&&map[v.jugador_votado_id]) map[v.jugador_votado_id].mvps++;
+  // Contar MVPs: 1 por partido ganado (no por votos recibidos)
+  const partidosCerrados=partidos.filter(p=>!p.mvp_abierto&&p.estado==='finalizado');
+  partidosCerrados.forEach(par=>{
+    const winner=getMvpWinner(par.id);
+    if(winner&&map[winner]) map[winner].mvps++;
   });
   return Object.values(map).filter(p=>p.pj>0).sort((a,b)=>b.pts-a.pts||b.ganados-a.ganados||b.goles-a.goles);
 }
@@ -1116,12 +1117,53 @@ function openSwap(jidSale,equipo){
   document.getElementById('swap-sale-nombre').textContent=saleJ.nombre;
   const pp=partidos.find(p=>p.estado==='pendiente');
   const enPartido=stats.filter(s=>s.partido_id===pp.id).map(s=>s.jugador_id);
-  const candidates=jugadores.filter(j=>!enPartido.includes(j.id));
-  document.getElementById('swap-candidates').innerHTML=candidates.length
-    ?candidates.map(j=>`<div class="swap-row"><div style="display:flex;align-items:center;gap:8px">${avHtml(j.nombre,j.color)}<span style="font-size:14px;font-weight:600">${j.nombre}</span></div><button class="btn btn-primary" style="padding:6px 14px;font-size:11px" onclick="doSwap(${j.id})">Poner</button></div>`).join('')
-    :'<div style="color:var(--muted);font-size:13px">No hay jugadores disponibles</div>';
+  const otroEquipo=equipo==='a'?'b':'a';
+  const otroEquipoNombre=equipo==='a'?(pp.equipo_b||'Equipo B'):(pp.equipo_a||'Equipo A');
+  const jugadoresOtroEquipo=stats.filter(s=>s.partido_id===pp.id&&s.equipo===otroEquipo).map(s=>getJ(s.jugador_id));
+  const fueraDelPartido=jugadores.filter(j=>j.activo!==false&&!enPartido.includes(j.id));
+
+  document.getElementById('swap-candidates').innerHTML=`
+    ${jugadoresOtroEquipo.length?`
+      <div style="font-family:'Barlow Condensed';font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--rojo);margin-bottom:8px">
+        Intercambiar con jugador de ${otroEquipoNombre}
+      </div>
+      ${jugadoresOtroEquipo.map(j=>`
+        <div class="swap-row">
+          <div style="display:flex;align-items:center;gap:8px">${avHtml(j.nombre,j.color)}<span style="font-size:14px;font-weight:600">${j.nombre}</span></div>
+          <button class="btn btn-warning" style="padding:6px 14px;font-size:11px" onclick="doSwapInterno(${jidSale},${j.id})">⇄ Intercambiar</button>
+        </div>`).join('')}
+      <div style="margin:14px 0;border-top:1px solid var(--border)"></div>`:''}
+    <div style="font-family:'Barlow Condensed';font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px">
+      Reemplazar por jugador externo
+    </div>
+    ${fueraDelPartido.length
+      ?fueraDelPartido.map(j=>`
+        <div class="swap-row">
+          <div style="display:flex;align-items:center;gap:8px">${avHtml(j.nombre,j.color)}<span style="font-size:14px;font-weight:600">${j.nombre}</span></div>
+          <button class="btn btn-primary" style="padding:6px 14px;font-size:11px" onclick="doSwap(${j.id})">Poner</button>
+        </div>`).join('')
+      :'<div style="color:var(--muted);font-size:13px">No hay jugadores disponibles</div>'}`;
   openOverlay('modal-swap');
 }
+async function doSwapInterno(jidA, jidB){
+  // Swap two players already in the partido between teams
+  const pp=partidos.find(p=>p.estado==='pendiente');if(!pp)return;
+  if(sb){
+    const{data:rowA}=await sb.from('partido_jugadores').select('equipo').eq('partido_id',pp.id).eq('jugador_id',jidA).single();
+    const{data:rowB}=await sb.from('partido_jugadores').select('equipo').eq('partido_id',pp.id).eq('jugador_id',jidB).single();
+    if(!rowA||!rowB){alert('Error al encontrar jugadores');return;}
+    // Swap their equipos
+    await sb.from('partido_jugadores').update({equipo:rowB.equipo}).eq('partido_id',pp.id).eq('jugador_id',jidA);
+    await sb.from('partido_jugadores').update({equipo:rowA.equipo}).eq('partido_id',pp.id).eq('jugador_id',jidB);
+    await loadData();
+  }else{
+    const rowA=stats.find(s=>s.partido_id===pp.id&&s.jugador_id===jidA);
+    const rowB=stats.find(s=>s.partido_id===pp.id&&s.jugador_id===jidB);
+    if(rowA&&rowB){const tmp=rowA.equipo;rowA.equipo=rowB.equipo;rowB.equipo=tmp;}
+  }
+  closeModalById('modal-swap');renderTabla();renderAdminPartidoTab();
+}
+
 async function doSwap(jidEntra){
   const pp=partidos.find(p=>p.estado==='pendiente');if(!pp)return;
   if(sb){
@@ -1709,9 +1751,14 @@ async function guardarFechaPartido(){
   const btn=event.target;
   btn.disabled=true;btn.textContent='Guardando...';
   if(sb){
-    // Delete existing and insert fresh to avoid upsert issues
-    await sb.from('configuracion').delete().eq('clave','fecha_proximo_partido');
-    const{error}=await sb.from('configuracion').insert({clave:'fecha_proximo_partido',valor:fecha});
+    // Try update first, if no rows affected then insert
+    const{data:existing}=await sb.from('configuracion').select('id').eq('clave','fecha_proximo_partido');
+    let error;
+    if(existing&&existing.length>0){
+      ({error}=await sb.from('configuracion').update({valor:fecha}).eq('clave','fecha_proximo_partido'));
+    }else{
+      ({error}=await sb.from('configuracion').insert({clave:'fecha_proximo_partido',valor:fecha}));
+    }
     if(error){alert('Error al guardar: '+error.message);btn.disabled=false;btn.textContent='Guardar fecha';return;}
     configuracion['fecha_proximo_partido']=fecha;
   }else{
